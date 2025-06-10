@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h3>Text Highlighter</h3>
+        
+        <!-- Search Field -->
+        <div class="section">
+            <label>Text to highlight:</label>
+            <input type="text" id="searchText" placeholder="Enter text or select in document">
+        </div>
+        
+        <!-- Case Sensitivity -->
+        <div class="section">
+            <label>
+                <input type="checkbox" id="ignoreCase" checked> 
+                Ignore case
+            </label>
+        </div>
+        
+        <!-- Highlight Color -->
+        <div class="section">
+            <label>Highlight color:</label>
+            <select id="highlightColor">
+                <option value="yellow">Yellow</option>
+                <option value="green">Green</option>
+                <!-- Add 14 more colors -->
+                <option value="none">No Fill</option>
+            </select>
+        </div>
+        
+        <!-- Text Color -->
+        <div class="section">
+            <label>Text color:</label>
+            <input type="color" id="textColor" value="#000000">
+        </div>
+        
+        <!-- Text Formatting -->
+        <div class="section">
+            <label>Text formatting:</label>
+            <div class="format-buttons">
+                <button data-format="bold">B</button>
+                <button data-format="italic">I</button>
+                <button data-format="underline">U</button>
+                <button data-format="strikethrough">S</button>
+            </div>
+        </div>
+        
+        <!-- Apply Button -->
+        <button id="applyBtn" disabled>Apply</button>
+        <div id="message"></div>
+    </div>
+    <script src="code.js"></script>
+</body>
+</html>
