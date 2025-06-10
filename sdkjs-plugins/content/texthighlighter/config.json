@@ -1,0 +1,19 @@
+{
+    "name": "Text Highlighter",
+    "version": "1.0.0",
+    "manifestVersion": "7.3.0",
+    "description": "Highlight text with custom formatting",
+    "icons": {
+        "light": "resources/light/icon.svg",
+        "dark": "resources/dark/icon.svg"
+    },
+    "actions": [{
+        "name": "Text Highlighter",
+        "icon": "resources/light/icon.svg",
+        "action": "run",
+        "shortcut": "Ctrl+Alt+H"
+    }],
+    "html": "index.html",
+    "scripts": ["code.js"],
+    "styles": ["styles.css"]
+}
