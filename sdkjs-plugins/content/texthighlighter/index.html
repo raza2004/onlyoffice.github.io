@@ -1,26 +1,31 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet"
+        href="https://raza2004.github.io/onlyoffice.github.io/sdkjs-plugins/content/texthighlighter/styles.css">
+    <script src="https://raza2004.github.io/onlyoffice.github.io/sdkjs-plugins/content/texthighlighter/code.js"
+        defer></script>
 </head>
+
 <body>
     <div class="container">
         <h3>Text Highlighter</h3>
-        
+
         <!-- Search Field -->
         <div class="section">
             <label>Text to highlight:</label>
             <input type="text" id="searchText" placeholder="Enter text or select in document">
         </div>
-        
+
         <!-- Case Sensitivity -->
         <div class="section">
             <label>
-                <input type="checkbox" id="ignoreCase" checked> 
+                <input type="checkbox" id="ignoreCase" checked>
                 Ignore case
             </label>
         </div>
-        
+
         <!-- Highlight Color -->
         <div class="section">
             <label>Highlight color:</label>
@@ -31,13 +36,13 @@
                 <option value="none">No Fill</option>
             </select>
         </div>
-        
+
         <!-- Text Color -->
         <div class="section">
             <label>Text color:</label>
             <input type="color" id="textColor" value="#000000">
         </div>
-        
+
         <!-- Text Formatting -->
         <div class="section">
             <label>Text formatting:</label>
@@ -48,11 +53,12 @@
                 <button data-format="strikethrough">S</button>
             </div>
         </div>
-        
+
         <!-- Apply Button -->
         <button id="applyBtn" disabled>Apply</button>
         <div id="message"></div>
     </div>
-    <script src="code.js"></script>
+
 </body>
+
 </html>
