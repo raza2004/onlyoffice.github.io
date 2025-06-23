@@ -14,10 +14,16 @@
       "description": "Text Highlighter Panel",
       "url": "index.html",
       "icons": ["resources/light/icon.svg"],
-      "isViewer": false,
-      "EditorsSupport": ["word"],         
-      "type": "panel",                          
-      "initDataType": "none",
+      "isViewer" : true,
+			"EditorsSupport"  : ["word", "pdf"],
+			"isVisual" : true,
+			"isModal" : false,
+			"isInsideMode" : true,
+			"initDataType" : "text",
+			"isUpdateOleOnResize" : true,
+			"initOnSelectionChanged": true,                          
+      "events": ["onSelectionChanged", "onClick", "onApply", "onGetSelectedText"],
+    "methods": ["ApplyHighlight", "GetSelectedText"],
       "buttons": []
     }
   ]
