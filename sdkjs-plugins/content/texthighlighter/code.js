@@ -1,162 +1,171 @@
-(function (window) {
-  // Keep lastParams in scope for onOpen and “Highlight more”
-  let lastParams = null;
+(function(window) {
+  "use strict";
 
-  // Utility: does the current document have any non‐empty paragraph?
-  function documentHasText() {
-    const doc = Api.GetDocument();
-    return doc.GetAllParagraphs().some(p => p.GetText().trim() !== "");
-  }
-
-  // Initialize and wire up the sidebar UI
-  function initPluginUI() {
-    const searchInput       = document.getElementById("searchText");
-    const ignoreCaseBox     = document.getElementById("ignoreCase");
-    const highlightSel      = document.getElementById("highlightColor");
-    const textColorPicker   = document.getElementById("textColor");
-    const boldCheckbox      = document.getElementById("boldCheckbox");
-    const italicCheckbox    = document.getElementById("italicCheckbox");
-    const underlineCheckbox = document.getElementById("underlineCheckbox");
-    const strikeCheckbox    = document.getElementById("strikeCheckbox");
-    const applyBtn          = document.getElementById("applyBtn");
-    const noMatchesDiv      = document.getElementById("noMatches");
-    const highlightMoreLink = document.getElementById("highlightMore");
-
-    if (!searchInput || !applyBtn) {
-      console.error("Required sidebar elements missing");
-      return;
-    }
-
-    // Toggle Apply button enabled state
-    function refreshApplyButton() {
-      applyBtn.disabled = !(documentHasText() && searchInput.value.trim() !== "");
-    }
-
-    searchInput.addEventListener("input", refreshApplyButton);
-    ignoreCaseBox.addEventListener("change", refreshApplyButton);
-
-    applyBtn.addEventListener("click", () => {
-      // Hide “no matches” if showing
-      if (noMatchesDiv) noMatchesDiv.style.display = "none";
-
-      const rawSearch     = searchInput.value.trim();
-      if (!rawSearch) return;
-
-      const params = {
-        rawSearch,
-        ignoreCase:    ignoreCaseBox.checked,
-        highlightColor: highlightSel.value,
-        textColor:     textColorPicker.value,
-        doBold:        boldCheckbox.checked,
-        doItalic:      italicCheckbox.checked,
-        doUnderline:   underlineCheckbox.checked,
-        doStrike:      strikeCheckbox.checked
-      };
-
-      lastParams = params;
-
-      // Defer document changes into the editor context
-      this.callCommand(() => {
-        const {
-          rawSearch, ignoreCase,
-          highlightColor, textColor,
-          doBold, doItalic, doUnderline, doStrike
-        } = Asc.scope.lastParams;
-
-        const doc        = Api.GetDocument();
-        const paragraphs = doc.GetAllParagraphs();
-        let matchesFound = 0;
-
-        const escaped = rawSearch.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        const flags   = ignoreCase ? "gi" : "g";
-        const regex   = new RegExp("(" + escaped + ")", flags);
-
-        function equals(a, b) {
-          return ignoreCase
-            ? a.toLowerCase() === b.toLowerCase()
-            : a === b;
-        }
-
-        paragraphs.forEach(paragraph => {
-          const text = paragraph.GetText();
-          if (!text || !regex.test(text)) return;
-
-          matchesFound++;
-          const segments = text.split(regex);
-          paragraph.RemoveAllElements();
-
-          segments.forEach(segment => {
-            const run = Api.CreateRun();
-            run.AddText(segment);
-
-            if (equals(segment, rawSearch)) {
-              if (highlightColor !== "NoFill") run.SetHighlight(highlightColor);
-              const r = parseInt(textColor.slice(1,3), 16);
-              const g = parseInt(textColor.slice(3,5), 16);
-              const b = parseInt(textColor.slice(5,7), 16);
-              run.SetColor(r, g, b, false);
-
-              if (doBold)      run.SetBold(true);
-              if (doItalic)    run.SetItalic(true);
-              if (doUnderline) run.SetUnderline(true);
-              if (doStrike)    run.SetStrikeout(true);
-            }
-
-            paragraph.AddElement(run);
-          });
-        });
-
-        // After processing, show “no matches” or “highlight more” link
-        if (matchesFound === 0 && noMatchesDiv) {
-          noMatchesDiv.style.display = "block";
-        }
-        if (highlightMoreLink) {
-          highlightMoreLink.style.display = "block";
-        }
-      }, true);
-
-      // Close the sidebar so the user sees the updated doc
-      Api.CloseSidebar();
+  // === 1) Dropdown toggle bindings (run once on DOM load) ===
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".dropdown-header").forEach(header => {
+      header.addEventListener("click", () => {
+        header.parentElement.classList.toggle("open");
+      });
     });
+  });
 
-    // “Highlight more” → reopen and repopulate
-    if (highlightMoreLink) {
-      highlightMoreLink.addEventListener("click", () => {
-        if (!lastParams) return;
-        Api.OpenSidebar("index.html");
+  // === 2) ONLYOFFICE plugin code ===
+
+  // UI elements (filled in init)
+  let searchInput, ignoreCaseBox, applyBtn;
+  let stateInput, stateNo, stateDone;
+  let loader, foundCountSpan;
+  let highlightMore1, highlightMore2, revertBtn;
+
+  window.Asc.plugin.init = function(text) {
+    // Cache DOM nodes
+    searchInput    = document.getElementById("searchText");
+    ignoreCaseBox  = document.getElementById("ignoreCase");
+    applyBtn       = document.getElementById("applyButton");
+    stateInput     = document.getElementById("state-input");
+    stateNo        = document.getElementById("state-no-results");
+    stateDone      = document.getElementById("state-done");
+    loader         = document.getElementById("loader");
+    foundCountSpan = document.getElementById("foundCount");
+    highlightMore1 = document.getElementById("highlightMore1");
+    highlightMore2 = document.getElementById("highlightMore2");
+    revertBtn      = document.getElementById("revertButton");
+
+    // Simple state-switchers
+    function showInput() {
+      stateInput.style.display = "";
+      stateNo.style.display    = "none";
+      stateDone.style.display  = "none";
+      loader.style.display     = "none";
+    }
+    function showNoResults() {
+      stateInput.style.display = "none";
+      stateNo.style.display    = "";
+      stateDone.style.display  = "none";
+      loader.style.display     = "none";
+    }
+    function showDone(count) {
+      stateInput.style.display = "none";
+      stateNo.style.display    = "none";
+      stateDone.style.display  = "";
+      loader.style.display     = "none";
+      foundCountSpan.textContent = count;
+    }
+
+    // Wire up UI
+    applyBtn.disabled = true;
+    searchInput.addEventListener("input", () => {
+      applyBtn.disabled = !searchInput.value.trim();
+    });
+    applyBtn.addEventListener("click", onApply);
+    highlightMore1.addEventListener("click", showInput);
+    highlightMore2.addEventListener("click", showInput);
+    revertBtn.addEventListener("click", onRevert);
+
+    // If the plugin was opened with a selection, use it
+    if (text && text.trim()) {
+      searchInput.value = text.trim();
+      applyBtn.disabled = false;
+    }
+
+    // React when user changes selection in the document
+    if (window.Asc.plugin.attachEvent) {
+      window.Asc.plugin.attachEvent("onSelectionChanged", sel => {
+        if (sel && sel.text) {
+          searchInput.value = sel.text;
+          applyBtn.disabled = false;
+        }
       });
     }
 
-    // Called by ONLYOFFICE after sidebar HTML is injected
-    window.onOpen = () => {
-      if (!lastParams) return;
+    // Initialize last-term storage
+    Asc.scope.lastTerm     = "";
+    Asc.scope.lastCaseSens = false;
 
-      document.getElementById("searchText").value       = lastParams.rawSearch;
-      document.getElementById("ignoreCase").checked     = lastParams.ignoreCase;
-      document.getElementById("highlightColor").value   = lastParams.highlightColor;
-      document.getElementById("textColor").value        = lastParams.textColor;
-      document.getElementById("boldCheckbox").checked   = lastParams.doBold;
-      document.getElementById("italicCheckbox").checked = lastParams.doItalic;
-      document.getElementById("underlineCheckbox").checked = lastParams.doUnderline;
-      document.getElementById("strikeCheckbox").checked = lastParams.doStrike;
+    // Show the initial state
+    showInput();
+  };
 
-      refreshApplyButton();
-    };
+  // 3) Apply highlights
+  function onApply() {
+    const term    = searchInput.value.trim();
+    const caseSens= !ignoreCaseBox.checked;
+    
+     const hlColor    = document.getElementById("highlightColor").value;
+    const txtColor   = document.getElementById("textColor") .value;
+    const doBold     = document.getElementById("boldCheckbox") .checked;
+    const doItalic   = document.getElementById("italicCheckbox").checked;
+    const doUnder    = document.getElementById("underlineCheckbox").checked;
+    const doStrike   = document.getElementById("strikeCheckbox").checked;
 
-    // Finally, initialize button state when the panel’s DOM is ready
-    document.addEventListener("DOMContentLoaded", refreshApplyButton);
+    // remember for revert
+    Asc.scope.lastTerm      = term;
+    Asc.scope.lastCaseSens  = caseSens;
+    Asc.scope.lastHlColor   = hlColor;
+    Asc.scope.lastTxtColor  = txtColor;
+    Asc.scope.lastDoBold    = doBold;
+    Asc.scope.lastDoItalic  = doItalic;
+    Asc.scope.lastDoUnderline = doUnder;
+    Asc.scope.lastDoStrike  = doStrike;
+
+
+    // transition UI
+    stateInput.style.display = "none";
+    stateNo.style.display    = "none";
+    stateDone.style.display  = "none";
+    loader.style.display     = "";
+
+    window.Asc.plugin.callCommand(function() {
+      const results = Api.GetDocument().Search(Asc.scope.lastTerm, Asc.scope.lastCaseSens);
+      results.forEach(function(range) {
+        range.SetHighlight(Asc.scope.lastHlColor);
+        if (Asc.scope.lastDoBold)      range.SetBold(true);
+        if (Asc.scope.lastDoItalic)    range.SetItalic(true);
+        if (Asc.scope.lastDoUnderline) range.SetUnderline(true);
+        if (Asc.scope.lastDoStrike)    range.SetStrikeout(true);
+        if (Asc.scope.lastTxtColor !== "#000000") {
+          var rgb = Asc.scope.lastTxtColor
+            .slice(1)
+            .match(/.{2}/g)
+            .map(h => parseInt(h, 16));
+          range.SetColor(rgb[0], rgb[1], rgb[2], false);
+        }
+      });
+      return results.length;
+    }, false);
   }
 
-  // Plugin entry point → ONLYOFFICE calls this when the user opens the panel
-  window.Asc.plugin.init = function () {
-    initPluginUI();
+  // 4) Revert highlights
+  function onRevert() {
+    loader.style.display = "";
+    window.Asc.plugin.callCommand(function() {
+      const results = Api.GetDocument().Search(Asc.scope.lastTerm, Asc.scope.lastCaseSens);
+      results.forEach(r => {
+        r.SetHighlight("none");
+        r.SetBold(false);
+        r.SetItalic(false);
+        r.SetUnderline(false);
+        r.SetStrikeout(false);
+        r.SetColor(0,0,0,false);
+      });
+      return results.length;
+    }, false);
+  }
+
+  // 5) After each callCommand
+  window.Asc.plugin.onCommandCallback = function(count) {
+    const n = Number(count) || 0;
+    if (!Asc.scope.lastTerm) {
+      // fallback
+      document.getElementById("state-input").style.display = "";
+    } else if (n === 0) {
+      document.getElementById("state-no-results").style.display = "";
+    } else {
+      document.getElementById("state-done").style.display = "";
+      foundCountSpan.textContent = n;
+    }
+    loader.style.display = "none";
   };
 
-  // Handle “OK” / “Close” buttons in a modal variant (if you set one up)
-  window.Asc.plugin.button = function (id) {
-    this.executeCommand("close", "");
-  };
-
-  // Expose lastParams into the editor context for callCommand
-  Asc.scope.lastParams = () => lastParams;
 })(window);

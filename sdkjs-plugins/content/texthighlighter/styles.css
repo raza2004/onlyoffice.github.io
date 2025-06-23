@@ -2,24 +2,145 @@
     padding: 15px;
     font-family: Arial, sans-serif;
 }
+
+.container p {
+  font-size: 14px;
+  margin: 10px 0;
+  text-align: center;
+}
+
+#state-no-results button,
+#state-done button {
+  width: 100%;
+  margin-top: 8px;
+}
+
+#state-done p:first-child {
+  font-weight: bold;
+}
+
+/* Dropdown panel wrapper */
+.dropdown {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+/* Header always visible */
+.dropdown-header {
+  padding: 10px;
+  background: #f9f9f9;
+  cursor: pointer;
+  position: relative;
+  font-weight: bold;
+}
+
+/* The little arrow */
+.dropdown-header .arrow {
+  position: absolute;
+  right: 12px;
+  transition: transform 0.2s;
+}
+
+/* Collapsed by default */
+.dropdown-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  background: #fff;
+  padding: 0 10px;
+}
+
+/* When open, allow comfortable height */
+.dropdown.open .dropdown-content {
+  max-height: 150px; /* adjust if you need more space */
+  padding: 10px;
+}
+
+/* Rotate arrow when open */
+.dropdown.open .dropdown-header .arrow {
+  transform: rotate(90deg);
+}
+
+/* Formatting options laid out */
+.format-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.format-options label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #f0f0f0;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+
 .section {
     margin-bottom: 15px;
 }
+
 input[type="text"] {
     width: 100%;
-    padding: 5px;
+    padding: 8px;
+    box-sizing: border-box;
 }
-.format-buttons button {
-    margin-right: 5px;
+
+.format-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.format-option {
+    display: flex;
+    align-items: center;
     padding: 5px 10px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    cursor: pointer;
 }
-#applyBtn {
+
+.format-option:hover {
+    background: #e0e0e0;
+}
+
+.format-option.active {
+    background: #446995;
+    color: white;
+}
+
+#applyButton {
     background: #446995;
     color: white;
     border: none;
-    padding: 8px 15px;
+    padding: 10px 20px;
     cursor: pointer;
+    border-radius: 4px;
+    font-weight: bold;
+    width: 100%;
+    margin-top: 15px;
 }
-#applyBtn:disabled {
+
+#applyButton:disabled {
     background: #cccccc;
+    cursor: not-allowed;
+}
+
+.message {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+#loader {
+    text-align: center;
+    font-style: italic;
+    color: #666;
 }

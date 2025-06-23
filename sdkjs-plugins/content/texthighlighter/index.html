@@ -1,64 +1,85 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-    <link rel="stylesheet"
-        href="https://raza2004.github.io/onlyoffice.github.io/sdkjs-plugins/content/texthighlighter/styles.css">
-    <script src="https://raza2004.github.io/onlyoffice.github.io/sdkjs-plugins/content/texthighlighter/code.js"
-        defer></script>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://onlyoffice.github.io/sdkjs-plugins/v1/plugins.js"></script>
+  <script src="https://onlyoffice.github.io/sdkjs-plugins/v1/plugins-ui.js"></script>
+  <script src="code.js" defer></script>
 </head>
-
 <body>
-    <div class="container">
-        <h3>Text Highlighter</h3>
+  <div class="container">
+    <h3>Text Highlighter</h3>
 
-        <!-- Search Field -->
-        <div class="section">
-            <label>Text to highlight:</label>
-            <input type="text" id="searchText" placeholder="Enter text or select in document">
-        </div>
+    <!-- STATE 1: Input + Apply -->
+    <!-- STATE 1: Input + Apply -->
+<div id="state-input">
+  <div class="section">
+    <label>Text to search:</label>
+    <input type="text" id="searchText" placeholder="Enter text or select in document">
+  </div>
 
-        <!-- Case Sensitivity -->
-        <div class="section">
-            <label>
-                <input type="checkbox" id="ignoreCase" checked>
-                Ignore case
-            </label>
-        </div>
+  <div class="section">
+    <label><input type="checkbox" id="ignoreCase" checked> Ignore case</label>
+  </div>
 
-        <!-- Highlight Color -->
-        <div class="section">
-            <label>Highlight color:</label>
-            <select id="highlightColor">
-                <option value="yellow">Yellow</option>
-                <option value="green">Green</option>
-                <!-- Add 14 more colors -->
-                <option value="none">No Fill</option>
-            </select>
-        </div>
+  <div class="section">
+    <label>Highlight color:</label>
+    <select id="highlightColor">
+      <option value="yellow">Yellow</option>
+      <option value="green">Green</option>
+      <option value="blue">Blue</option>
+      <option value="red">Red</option>
+      <option value="none">No Fill</option>
+    </select>
+  </div>
 
-        <!-- Text Color -->
-        <div class="section">
-            <label>Text color:</label>
-            <input type="color" id="textColor" value="#000000">
-        </div>
+  <!-- Text Color dropdown -->
+  <div class="dropdown">
+    <div class="dropdown-header" id="textColorHeader">
+      Text color
+      <span class="arrow">▸</span>
+    </div>
+    <div class="dropdown-content" id="textColorContent">
+      <input type="color" id="textColor" value="#000000">
+    </div>
+  </div>
 
-        <!-- Text Formatting -->
-        <div class="section">
-            <label>Text formatting:</label>
-            <div class="format-buttons">
-                <button data-format="bold">B</button>
-                <button data-format="italic">I</button>
-                <button data-format="underline">U</button>
-                <button data-format="strikethrough">S</button>
-            </div>
-        </div>
+  <!-- Text Formatting dropdown -->
+  <div class="dropdown">
+    <div class="dropdown-header" id="formatHeader">
+      Text formatting
+      <span class="arrow">▸</span>
+    </div>
+    <div class="dropdown-content format-options" id="formatContent">
+      <label><input type="checkbox" id="boldCheckbox"> Bold</label>
+      <label><input type="checkbox" id="italicCheckbox"> Italic</label>
+      <label><input type="checkbox" id="underlineCheckbox"> Underline</label>
+      <label><input type="checkbox" id="strikeCheckbox"> Strikethrough</label>
+    </div>
+  </div>
 
-        <!-- Apply Button -->
-        <button id="applyBtn" disabled>Apply</button>
-        <div id="message"></div>
+  <button id="applyButton">Apply</button>
+</div>
+
+
+    <!-- STATE 2: No matches -->
+    <div id="state-no-results" style="display:none">
+      <p>Search completed. <strong>No matches found.</strong></p>
+      <button id="highlightMore1">Highlight more</button>
     </div>
 
-</body>
+    <!-- STATE 3: Done / Matches found -->
+    <div id="state-done" style="display:none">
+      <p>Done! The search is complete and styles have been applied.</p>
+      <p>Matches found: <span id="foundCount">0</span></p>
+      <button id="revertButton">Revert to Original</button>
+      <button id="highlightMore2">Highlight more</button>
+    </div>
 
+    <!-- LOADING SPINNER -->
+    <div id="loader" style="display:none; text-align:center; font-style:italic; color:#666;">
+      Processing...
+    </div>
+  </div>
+</body>
 </html>
