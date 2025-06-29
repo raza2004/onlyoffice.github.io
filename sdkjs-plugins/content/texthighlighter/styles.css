@@ -1,6 +1,22 @@
+body {
+  background: #fff;
+  overflow-y: scroll;
+  color: #333;
+}
 .container {
     padding: 15px;
+    overflow-y: auto;
+    height: 100vh;;
     font-family: Arial, sans-serif;
+}
+.container::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.container {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
 .container p {
@@ -124,7 +140,8 @@ input[type="text"] {
     border-radius: 4px;
     font-weight: bold;
     width: 100%;
-    margin-top: 15px;
+    margin-top: 18px;
+    margin-bottom: 15px;
 }
 
 #applyButton:disabled {
@@ -144,3 +161,76 @@ input[type="text"] {
     font-style: italic;
     color: #666;
 }
+
+body.dark-mode {
+  background: #404040;
+  color: #ddd;
+}
+body.dark-mode input[type="text"],
+body.dark-mode select,
+body.dark-mode .dropdown-content {
+  background: #2a2a2a;
+  color: #ddd;
+  border-color: #444;
+}
+body.dark-mode .dropdown-header {
+  background: #2a2a2a;
+  color: #ddd;
+  border-color: #444;
+}
+body.dark-mode .dropdown.open .dropdown-content {
+  background: #2a2a2a;
+}
+body.dark-mode .format-options label {
+  background: #333;
+  color: #eee;
+}
+body.dark-mode .format-options label:hover {
+  background: #3a3a3a;
+}
+body.dark-mode button {
+  background: #fff !important;
+  opacity: 0.8 !important;
+  color: #333 !important;
+}
+body.dark-mode button:disabled {
+  background: #fff !important;
+  opacity: 0.5 !important;
+  color: #333 !important;
+}
+body.dark-mode .loader {
+  color: #aaa;
+}
+
+/* ─── Desktop/wide screens ─────────────────────────────────── */
+@media (min-width: 1300px) {
+  .container {
+    max-width: 500px;     /* widen the panel */
+    font-size: 1.1rem;    /* bump up base text */
+    padding: 20px;
+  }
+  h3 {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+  }
+  input[type="text"], select {
+    font-size: 1rem;
+    padding: 10px;
+  }
+  .dropdown-header {
+    font-size: 1rem;
+    padding: 12px;
+  }
+  .dropdown-content input,
+  .format-options label {
+    font-size: 0.95rem;
+  }
+  #applyButton,
+  #state-no-results button,
+  #state-done button {
+    font-size: 1rem;
+    padding: 12px;
+  }
+  /* Make the container scroll if it grows taller than the sidebar */
+  }
+
