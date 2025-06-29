@@ -10,6 +10,20 @@
     });
   });
 
+  // 2) Theme change handler
+  function onThemeChanged(theme) {
+    // Let OnlyOffice apply its base styling
+    window.Asc.plugin.onThemeChangedBase(theme);
+
+    // Log to console
+    console.log("Detected theme:", theme.type);
+
+    // Toggle our dark-mode class
+    document.body.classList.toggle("dark-mode", theme.type === "dark");
+  }
+  window.Asc.plugin.attachEvent?.("onThemeChanged", onThemeChanged);
+  window.Asc.plugin.onThemeChanged = onThemeChanged;
+
   // === 2) ONLYOFFICE plugin code ===
 
   // UI elements (filled in init)
@@ -169,3 +183,6 @@
   };
 
 })(window);
+
+
+
