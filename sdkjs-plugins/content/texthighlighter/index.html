@@ -4,13 +4,17 @@
   <link rel="stylesheet" href="styles.css">
   <script src="https://onlyoffice.github.io/sdkjs-plugins/v1/plugins.js"></script>
   <script src="https://onlyoffice.github.io/sdkjs-plugins/v1/plugins-ui.js"></script>
+  <!-- Add these AFTER your plugins-ui.js -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/classic.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr"></script>
+
 
   <!-- Main plugin logic -->
   <script src="code.js" defer></script>
 </head>
 <body>
   <div class="container scrollable">
-    <h3>Text Highlighter</h3>
+    <div class="header">Text Highlighter</div>
 
     <!-- STATE 1: Input + Apply -->
 
@@ -25,7 +29,7 @@
   </div>
 
   <div class="section">
-    <label>Highlight color:</label>
+    <label>Highlight color : </label>
     <select id="highlightColor">
       <option value="yellow">Yellow</option>
       <option value="green">Green</option>
@@ -42,7 +46,7 @@
       <span class="arrow">▸</span>
     </div>
     <div class="dropdown-content" id="textColorContent">
-      <input type="color" id="textColor" value="#000000">
+      <div id="textColorPicker"></div>
     </div>
   </div>
 

@@ -46,25 +46,41 @@
     highlightMore2 = document.getElementById("highlightMore2");
     revertBtn      = document.getElementById("revertButton");
 
+    Asc.scope.textColor = '#000000'; // match the pickr default
+    const pickrEl = document.getElementById('textColorPicker');
+if (pickrEl) {
+const pickr = Pickr.create({
+  el: pickrEl,
+  theme: 'classic',
+  default: '#000000',
+  components: {
+    preview: true,
+    opacity: true,
+    hue: true,
+    interaction: { hex: true, rgba: false, input: true, clear: false, save: true }
+  }
+});
+
+pickr.on('init', (instance) => {
+  const hex = instance.getColor().toHEXA().toString();
+  Asc.scope.textColor = hex;
+  Asc.scope.lastTxtColor = hex;
+});
+
+pickr.on('save', (color) => {
+  const hex = color.toHEXA().toString();
+  Asc.scope.textColor = hex;
+  Asc.scope.lastTxtColor = hex;
+  pickr.hide();
+});
+}
+
     // Simple state-switchers
     function showInput() {
       stateInput.style.display = "";
       stateNo.style.display    = "none";
       stateDone.style.display  = "none";
       loader.style.display     = "none";
-    }
-    function showNoResults() {
-      stateInput.style.display = "none";
-      stateNo.style.display    = "";
-      stateDone.style.display  = "none";
-      loader.style.display     = "none";
-    }
-    function showDone(count) {
-      stateInput.style.display = "none";
-      stateNo.style.display    = "none";
-      stateDone.style.display  = "";
-      loader.style.display     = "none";
-      foundCountSpan.textContent = count;
     }
 
     // Wire up UI
@@ -107,7 +123,7 @@
     const caseSens= !ignoreCaseBox.checked;
     
      const hlColor    = document.getElementById("highlightColor").value;
-    const txtColor   = document.getElementById("textColor") .value;
+    const txtColor   = Asc.scope.textColor || "#000000";
     const doBold     = document.getElementById("boldCheckbox") .checked;
     const doItalic   = document.getElementById("italicCheckbox").checked;
     const doUnder    = document.getElementById("underlineCheckbox").checked;
