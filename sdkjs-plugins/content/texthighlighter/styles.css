@@ -4,15 +4,64 @@ body {
   color: #333;
 }
 .container {
-    padding: 15px;
+    padding: 13px;
     overflow-y: auto;
-    height: 100vh;;
-    font-family: Arial, sans-serif;
+    height: 95vh;
 }
+
 .container::-webkit-scrollbar {
     display: none;
 }
 
+.header{
+      font-size: 1.2em;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    font-weight: bold;
+    text-decoration: underline;
+}
+/*  */
+#highlightColor {
+padding: 0.2em;
+    font-size: 0.8em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    cursor: pointer;
+}
+
+#highlightColor:hover {
+  border-color: #aaa;
+}
+
+#highlightColor option {
+  padding: 0.5em;
+  background-color: #fff;
+  color: #252525;
+}
+
+#highlightColor option:hover {
+  background-color: #ddd;
+}
+
+#highlightColor option[value="yellow"] {
+  background-color: #ffffcc;
+}
+
+#highlightColor option[value="green"] {
+  background-color: #ccffcc;
+}
+
+#highlightColor option[value="blue"] {
+  background-color: #ccccff;
+}
+
+#highlightColor option[value="red"] {
+  background-color: #ffcccc;
+}
+
+
+/*  */
 /* Hide scrollbar for IE, Edge and Firefox */
 .container {
   -ms-overflow-style: none;  /* IE and Edge */
@@ -20,7 +69,7 @@ body {
 }
 
 .container p {
-  font-size: 14px;
+  font-size: 12px;
   margin: 10px 0;
   text-align: center;
 }
@@ -98,11 +147,14 @@ body {
 
 
 .section {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
+    padding: 0 12px 12px 0;
 }
 
 input[type="text"] {
     width: 100%;
+    border-radius: 4px;
+    margin-top: 6px;
     padding: 8px;
     box-sizing: border-box;
 }
@@ -206,15 +258,15 @@ body.dark-mode .loader {
 @media (min-width: 1300px) {
   .container {
     max-width: 500px;     /* widen the panel */
-    font-size: 1.1rem;    /* bump up base text */
-    padding: 20px;
+    font-size: 0.9rem;    /* bump up base text */
+    padding: 18px;
   }
   h3 {
-    font-size: 1.4rem;
+    font-size: 1.1rem;
     margin-bottom: 1rem;
   }
   input[type="text"], select {
-    font-size: 1rem;
+    font-size: 0.8rem;
     padding: 10px;
   }
   .dropdown-header {
@@ -223,14 +275,22 @@ body.dark-mode .loader {
   }
   .dropdown-content input,
   .format-options label {
-    font-size: 0.95rem;
+    font-size: 0.85rem;
   }
   #applyButton,
   #state-no-results button,
   #state-done button {
-    font-size: 1rem;
+    font-size: 0.85rem;
     padding: 12px;
   }
   /* Make the container scroll if it grows taller than the sidebar */
   }
 
+#textColorPicker {
+  width: 100%;
+  height: 32px;
+  border: 1px solid #444;
+  border-radius: 4px;
+  cursor: pointer;
+  background: #000; /* initial default color swatch */
+}
