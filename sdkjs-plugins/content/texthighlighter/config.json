@@ -5,15 +5,13 @@
   "guid": "asc.{07FD8DFA-DFE0-4089-AL24-0730933CC804}",
   "manifestVersion": "7.3.0",
   "description": "Highlight text with custom formatting",
-  "icons": {
-    "light": "resources/light/icon.svg",
-    "dark": "resources/dark/icon.svg"
-  },
+      
   "variations": [
     {
       "description": "Text Highlighter Panel",
       "url": "index.html",
-      "icons": ["resources/light/icon.svg"],
+       "type":          "panel",
+      "size":          [300, 600],
       "isViewer" : true,
 			"EditorsSupport"  : ["word", "pdf"],
 			"isVisual" : true,
@@ -24,7 +22,41 @@
 			"initOnSelectionChanged": true,                          
       "events": ["onSelectionChanged", "onClick", "onApply", "onGetSelectedText"],
     "methods": ["ApplyHighlight", "GetSelectedText"],
-      "buttons": []
+      "buttons": [],
+       "icons": ["resources/light/icon.svg" ],
+      "icons2": [
+        {
+          "theme": "flat",
+          "style": "light",
+          "100%": { "normal": "resources/light/icon.svg" },
+          "125%": { "normal": "resources/light/icon.svg" },
+          "150%": { "normal": "resources/light/icon.svg" },
+          "175%": { "normal": "resources/light/icon.svg" },
+          "200%": { "normal": "resources/light/icon.svg" },
+          "default": { "normal": "resources/light/icon.svg" }
+        },
+        {
+          "theme": "flatDark",
+          "style": "dark",
+          "100%": { "normal": "resources/dark/icon.svg" },
+          "125%": { "normal": "resources/dark/icon.svg" },
+          "150%": { "normal": "resources/dark/icon.svg" },
+          "175%": { "normal": "resources/dark/icon.svg" },
+          "200%": { "normal": "resources/dark/icon.svg" }
+        }
+      ],
+
+       "store": {
+        "background": {
+          "light": "#042B42",
+          "dark":  "#5f55af"
+        },
+        "categories": ["work","specAbilities"],
+        "icons": {
+          "light": "resources/store/icons",
+          "dark":  "resources/store/icons"
+        }
+      }
     }
   ]
 }
