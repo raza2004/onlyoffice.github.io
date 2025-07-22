@@ -23,26 +23,26 @@
       "events": ["onSelectionChanged", "onClick", "onApply", "onGetSelectedText"],
     "methods": ["ApplyHighlight", "GetSelectedText"],
       "buttons": [],
-       "icons": ["resources/light/icon.svg" ],
+       "icons": ["resources/light/icon.svg","resources/light/icon@2x.svg" ],
       "icons2": [
         {
           "theme": "flat",
           "style": "light",
           "100%": { "normal": "resources/light/icon.svg" },
-          "125%": { "normal": "resources/light/icon.svg" },
-          "150%": { "normal": "resources/light/icon.svg" },
-          "175%": { "normal": "resources/light/icon.svg" },
-          "200%": { "normal": "resources/light/icon.svg" },
+          "125%": { "normal": "resources/light/icon@1.25x.svg" },
+          "150%": { "normal": "resources/light/icon@1.5x.svg" },
+          "175%": { "normal": "resources/light/icon@1.75x.svg" },
+          "200%": { "normal": "resources/light/icon@2x.svg" },
           "default": { "normal": "resources/light/icon.svg" }
         },
         {
           "theme": "flatDark",
           "style": "dark",
           "100%": { "normal": "resources/dark/icon.svg" },
-          "125%": { "normal": "resources/dark/icon.svg" },
-          "150%": { "normal": "resources/dark/icon.svg" },
-          "175%": { "normal": "resources/dark/icon.svg" },
-          "200%": { "normal": "resources/dark/icon.svg" }
+          "125%": { "normal": "resources/dark/icon@1.25x.svg" },
+          "150%": { "normal": "resources/dark/icon@1.5x.svg" },
+          "175%": { "normal": "resources/dark/icon@1.75x.svg" },
+          "200%": { "normal": "resources/dark/icon@2x.svg" }
         }
       ],
 

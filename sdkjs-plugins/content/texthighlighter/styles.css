@@ -22,6 +22,7 @@ body {
 }
 /*  */
 #highlightColor {
+  color: black;
 padding: 0.2em;
     font-size: 0.8em;
     border: 1px solid #ccc;
