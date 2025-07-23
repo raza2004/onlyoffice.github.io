@@ -48,7 +48,7 @@
 
        "store": {
         "background": {
-          "light": "#042B42",
+          "light": "#107cbc",
           "dark":  "#5f55af"
         },
         "categories": ["work","specAbilities"],
