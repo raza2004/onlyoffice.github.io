@@ -1,4 +1,4 @@
-(function(window) {
+(function (window) {
   "use strict";
 
   // === 1) Dropdown toggle bindings (run once on DOM load) ===
@@ -32,62 +32,65 @@
   let loader, foundCountSpan;
   let highlightMore1, highlightMore2, revertBtn;
 
-  window.Asc.plugin.init = function(text) {
+  window.Asc.plugin.init = function (text) {
     // Cache DOM nodes
-    searchInput    = document.getElementById("searchText");
-    ignoreCaseBox  = document.getElementById("ignoreCase");
-    applyBtn       = document.getElementById("applyButton");
-    stateInput     = document.getElementById("state-input");
-    stateNo        = document.getElementById("state-no-results");
-    stateDone      = document.getElementById("state-done");
-    loader         = document.getElementById("loader");
+    searchInput = document.getElementById("searchText");
+    ignoreCaseBox = document.getElementById("ignoreCase");
+    applyBtn = document.getElementById("applyButton");
+    stateInput = document.getElementById("state-input");
+    stateNo = document.getElementById("state-no-results");
+    stateDone = document.getElementById("state-done");
+    loader = document.getElementById("loader");
     foundCountSpan = document.getElementById("foundCount");
     highlightMore1 = document.getElementById("highlightMore1");
     highlightMore2 = document.getElementById("highlightMore2");
-    revertBtn      = document.getElementById("revertButton");
+    revertBtn = document.getElementById("revertButton");
 
     Asc.scope.textColor = '#000000'; // match the pickr default
     const pickrEl = document.getElementById('textColorPicker');
-if (pickrEl) {
-const pickr = Pickr.create({
-  el: pickrEl,
-  theme: 'classic',
-  default: '#000000',
-  components: {
-    preview: true,
-    opacity: true,
-    hue: true,
-    interaction: { hex: true, rgba: false, input: true, clear: false, save: true }
-  }
-});
+    if (pickrEl) {
+      const pickr = Pickr.create({
+        el: pickrEl,
+        theme: 'classic',
+        default: '#000000',
+        components: {
+          preview: true,
+          opacity: true,
+          hue: true,
+          interaction: { hex: true, rgba: false, input: true, clear: false, save: true }
+        }
+      });
 
-pickr.on('init', (instance) => {
-  const hex = instance.getColor().toHEXA().toString();
-  Asc.scope.textColor = hex;
-  Asc.scope.lastTxtColor = hex;
-});
+      pickr.on('init', (instance) => {
+        const hex = instance.getColor().toHEXA().toString();
+        Asc.scope.textColor = hex;
+        Asc.scope.lastTxtColor = hex;
+      });
 
-pickr.on('save', (color) => {
-  const hex = color.toHEXA().toString();
-  Asc.scope.textColor = hex;
-  Asc.scope.lastTxtColor = hex;
-  pickr.hide();
-});
-}
+      pickr.on('save', (color) => {
+        const hex = color.toHEXA().toString();
+        Asc.scope.textColor = hex;
+        Asc.scope.lastTxtColor = hex;
+        pickr.hide();
+      });
+    }
 
     // Simple state-switchers
     function showInput() {
       stateInput.style.display = "";
-      stateNo.style.display    = "none";
-      stateDone.style.display  = "none";
-      loader.style.display     = "none";
+      stateNo.style.display = "none";
+      stateDone.style.display = "none";
+      loader.style.display = "none";
+
     }
 
     // Wire up UI
     applyBtn.disabled = true;
     searchInput.addEventListener("input", () => {
       applyBtn.disabled = !searchInput.value.trim();
+      Asc.scope.appliedToSelection = false; // <-- add this
     });
+
     applyBtn.addEventListener("click", onApply);
     highlightMore1.addEventListener("click", showInput);
     highlightMore2.addEventListener("click", showInput);
@@ -110,95 +113,146 @@ pickr.on('save', (color) => {
     }
 
     // Initialize last-term storage
-    Asc.scope.lastTerm     = "";
+    Asc.scope.lastTerm = "";
     Asc.scope.lastCaseSens = false;
 
     // Show the initial state
     showInput();
   };
 
-  // 3) Apply highlights
+  // 3) Apply highlights - FIXED VERSION
   function onApply() {
-    const term    = searchInput.value.trim();
-    const caseSens= !ignoreCaseBox.checked;
-    
-     const hlColor    = document.getElementById("highlightColor").value;
-    const txtColor   = Asc.scope.textColor || "#000000";
-    const doBold     = document.getElementById("boldCheckbox") .checked;
-    const doItalic   = document.getElementById("italicCheckbox").checked;
-    const doUnder    = document.getElementById("underlineCheckbox").checked;
-    const doStrike   = document.getElementById("strikeCheckbox").checked;
+    const caseSens = !ignoreCaseBox.checked;
+    const hlColor = document.getElementById("highlightColor").value;
+    const txtColor = Asc.scope.textColor || "#000000";
+    const doBold = document.getElementById("boldCheckbox").checked;
+    const doItalic = document.getElementById("italicCheckbox").checked;
+    const doUnder = document.getElementById("underlineCheckbox").checked;
+    const doStrike = document.getElementById("strikeCheckbox").checked;
 
-    // remember for revert
-    Asc.scope.lastTerm      = term;
-    Asc.scope.lastCaseSens  = caseSens;
-    Asc.scope.lastHlColor   = hlColor;
-    Asc.scope.lastTxtColor  = txtColor;
-    Asc.scope.lastDoBold    = doBold;
-    Asc.scope.lastDoItalic  = doItalic;
-    Asc.scope.lastDoUnderline = doUnder;
-    Asc.scope.lastDoStrike  = doStrike;
+    // Store properties in Asc.scope
+    Asc.scope.caseSens = caseSens;
+    Asc.scope.hlColor = hlColor;
+    Asc.scope.txtColor = txtColor;
+    Asc.scope.doBold = doBold;
+    Asc.scope.doItalic = doItalic;
+    Asc.scope.doUnder = doUnder;
+    Asc.scope.doStrike = doStrike;
+    Asc.scope.lastTerm = searchInput.value.trim();
 
-
-    // transition UI
+    // Transition UI
     stateInput.style.display = "none";
-    stateNo.style.display    = "none";
-    stateDone.style.display  = "none";
-    loader.style.display     = "";
+    stateNo.style.display = "none";
+    stateDone.style.display = "none";
+    loader.style.display = "";
 
-    window.Asc.plugin.callCommand(function() {
-      const results = Api.GetDocument().Search(Asc.scope.lastTerm, Asc.scope.lastCaseSens);
-      results.forEach(function(range) {
-        range.SetHighlight(Asc.scope.lastHlColor);
-        if (Asc.scope.lastDoBold)      range.SetBold(true);
-        if (Asc.scope.lastDoItalic)    range.SetItalic(true);
-        if (Asc.scope.lastDoUnderline) range.SetUnderline(true);
-        if (Asc.scope.lastDoStrike)    range.SetStrikeout(true);
-        if (Asc.scope.lastTxtColor !== "#000000") {
-          var rgb = Asc.scope.lastTxtColor
-            .slice(1)
-            .match(/.{2}/g)
-            .map(h => parseInt(h, 16));
-          range.SetColor(rgb[0], rgb[1], rgb[2], false);
-        }
-      });
-      return results.length;
+    window.Asc.plugin.callCommand(function () {
+      const doc = Api.GetDocument();
+      const range = doc.GetRangeBySelect();
+      const textPr = Api.CreateTextPr();
+
+      // Set all text properties
+      textPr.SetHighlight(Asc.scope.hlColor);
+      if (Asc.scope.doBold) textPr.SetBold(true);
+      if (Asc.scope.doItalic) textPr.SetItalic(true);
+      if (Asc.scope.doUnder) textPr.SetUnderline(true);
+      if (Asc.scope.doStrike) textPr.SetStrikeout(true);
+
+      if (Asc.scope.txtColor !== "#000000") {
+        const rgb = Asc.scope.txtColor.slice(1).match(/.{2}/g).map(h => parseInt(h, 16));
+        textPr.SetColor(rgb[0], rgb[1], rgb[2], false);
+      }
+
+      if (range && range.GetText && range.GetText() !== "") {
+        // Apply to selected range
+        range.SetTextPr(textPr);
+        Asc.scope.appliedViaSelection = true;
+        return 1;
+      } else if (Asc.scope.lastTerm) {
+        // Search mode if no selection
+        const results = doc.Search(Asc.scope.lastTerm, Asc.scope.caseSens);
+        results.forEach(result => {
+          result.SetTextPr(textPr);
+        });
+        Asc.scope.appliedViaSelection = false;
+        return results.length;
+      } else {
+        // Apply to entire document
+        const paragraphs = doc.GetAllParagraphs();
+        paragraphs.forEach(para => {
+          para.SetTextPr(textPr);
+        });
+        Asc.scope.appliedViaSelection = true;
+        return paragraphs.length;
+      }
     }, false);
   }
 
   // 4) Revert highlights
   function onRevert() {
     loader.style.display = "";
-    window.Asc.plugin.callCommand(function() {
-      const results = Api.GetDocument().Search(Asc.scope.lastTerm, Asc.scope.lastCaseSens);
-      results.forEach(r => {
-        r.SetHighlight("none");
-        r.SetBold(false);
-        r.SetItalic(false);
-        r.SetUnderline(false);
-        r.SetStrikeout(false);
-        r.SetColor(0,0,0,false);
-      });
-      return results.length;
+
+    window.Asc.plugin.callCommand(function () {
+      const doc = Api.GetDocument();
+      const range = doc.GetRangeBySelect();
+
+      // Create a "revert" version of textPr
+      const textPr = Api.CreateTextPr();
+      textPr.SetHighlight("none");
+      textPr.SetBold(false);
+      textPr.SetItalic(false);
+      textPr.SetUnderline(false);
+      textPr.SetStrikeout(false);
+      textPr.SetColor(0, 0, 0, false);
+
+      if (range && range.GetText && range.GetText() !== "") {
+        // Revert selection only
+        range.SetTextPr(textPr);
+        Asc.scope.appliedViaSelection = true;
+        return 1;
+      } else if (Asc.scope.lastTerm) {
+        // Revert search results only
+        const results = doc.Search(Asc.scope.lastTerm, Asc.scope.caseSens);
+        results.forEach(result => {
+          result.SetTextPr(textPr);
+        });
+        Asc.scope.appliedViaSelection = false;
+        return results.length;
+      } else {
+        // Revert entire document
+        const paragraphs = doc.GetAllParagraphs();
+        paragraphs.forEach(para => {
+          para.SetTextPr(textPr);
+        });
+        Asc.scope.appliedViaSelection = true;
+        return paragraphs.length;
+      }
     }, false);
   }
 
-  // 5) After each callCommand
-  window.Asc.plugin.onCommandCallback = function(count) {
+
+  // 5) After each callCommand - Updated version
+  window.Asc.plugin.onCommandCallback = function (count) {
     const n = Number(count) || 0;
-    if (!Asc.scope.lastTerm) {
-      // fallback
-      document.getElementById("state-input").style.display = "";
-    } else if (n === 0) {
-      document.getElementById("state-no-results").style.display = "";
-    } else {
-      document.getElementById("state-done").style.display = "";
-      foundCountSpan.textContent = n;
-    }
     loader.style.display = "none";
+
+    if (n === 0) {
+      stateNo.style.display = "";
+      stateDone.style.display = "none";
+      stateInput.style.display = "none";
+    } else if (Asc.scope.appliedViaSelection) {
+      // show input again, so user can immediately re‐apply or revert
+      stateInput.style.display = "none";
+      stateDone.style.display = "";
+      stateNo.style.display = "";
+    } else {
+      // regular search‐based Done UI
+      foundCountSpan.textContent = n;
+      stateDone.style.display = "";
+      stateInput.style.display = "none";
+      stateNo.style.display = "none";
+    }
   };
 
+
 })(window);
-
-
-
