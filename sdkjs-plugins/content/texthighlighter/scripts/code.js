@@ -36,15 +36,15 @@
     // Cache DOM nodes
     searchInput = document.getElementById("searchText");
     ignoreCaseBox = document.getElementById("ignoreCase");
-    applyBtn = document.getElementById("applyButton");
+    applyBtn = document.getElementById("ApplyButton");
     stateInput = document.getElementById("state-input");
     stateNo = document.getElementById("state-no-results");
     stateDone = document.getElementById("state-done");
     loader = document.getElementById("loader");
     foundCountSpan = document.getElementById("foundCount");
-    highlightMore1 = document.getElementById("highlightMore1");
-    highlightMore2 = document.getElementById("highlightMore2");
-    revertBtn = document.getElementById("revertButton");
+    highlightMore1 = document.getElementById("HighlightMore1");
+    highlightMore2 = document.getElementById("HighlightMore2");
+    revertBtn = document.getElementById("RevertToOriginal");
 
     Asc.scope.textColor = '#000000'; // match the pickr default
     const pickrEl = document.getElementById('textColorPicker');
@@ -74,6 +74,7 @@
         pickr.hide();
       });
     }
+
 
     // Simple state-switchers
     function showInput() {
@@ -148,6 +149,14 @@
 
     window.Asc.plugin.callCommand(function () {
       const doc = Api.GetDocument();
+      const core = doc.GetCore();
+core.SetLanguage("fr-FR");
+
+const language = core.GetLanguage();
+
+  console.log("Document language:", language);
+ 
+
       const range = doc.GetRangeBySelect();
       const textPr = Api.CreateTextPr();
 
@@ -253,6 +262,46 @@
       stateNo.style.display = "none";
     }
   };
+
+  // 6) Translation hookup
+window.Asc.plugin.onTranslate = () => {
+//  const doc = Api.GetDocument();
+
+  const map = {
+    PluginInstructions: "PluginInstructions",
+    TextToSearch: "TextToSearch",
+    IgnoreCase: "IgnoreCase",
+    HighlightColor: "HighlightColor",
+    HighlightYellow: "HighlightYellow",
+    HighlightGreen: "HighlightGreen",
+    HighlightBlue: "HighlightBlue",
+    HighlightRed: "HighlightRed",
+    HighlightNone: "HighlightNone",
+    TextColorHeader: "TextColorHeader",
+    ArrowDropdown: "ArrowDropdown",
+    TextFormattingHeader: "TextFormattingHeader",
+    FormatBold: "FormatBold",
+    FormatItalic: "FormatItalic",
+    FormatUnderline: "FormatUnderline",
+    FormatStrike: "FormatStrike",
+    ApplyButton: "ApplyButton",
+    RevertToOriginal: "RevertToOriginal",
+    SearchNoResults: "SearchNoResults",
+    HighlightMore1: "HighlightMore",
+    HighlightMore2: "HighlightMore",
+    SearchDone: "SearchDone",
+    MatchesFound: "MatchesFound",
+    LoadingMessage: "LoadingMessage"
+  };
+
+  for (const id in map) {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = window.Asc.plugin.tr(map[id]);
+  }
+
+  const searchInput = document.getElementById("searchText");
+  if (searchInput) searchInput.placeholder = window.Asc.plugin.tr("SearchPlaceholder");
+};
 
 
 })(window);

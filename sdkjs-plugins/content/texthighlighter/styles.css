@@ -24,6 +24,7 @@ body {
 #highlightColor {
   color: black;
 padding: 0.2em;
+max-width: 80px;
     font-size: 0.8em;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -148,12 +149,15 @@ padding: 0.2em;
 
 
 .section {
+
     margin-bottom: 10px;
-    padding: 0 12px 12px 0;
+    padding: 0 2px 12px 0;
 
 }
 .section label {
         font-weight: bold;
+  align-items: center;
+        font-size: 15px;
         margin-bottom: 6px;
     }
 
@@ -189,7 +193,7 @@ input[type="text"] {
     color: white;
 }
 
-#applyButton {
+.applyButton {
     background: #446995;
     color: white;
     border: none;
@@ -202,7 +206,7 @@ input[type="text"] {
     margin-bottom: 15px;
 }
 
-#applyButton:disabled {
+.applyButton:disabled {
     background: #cccccc;
     cursor: not-allowed;
 }
@@ -283,7 +287,7 @@ body.dark-mode .loader {
   .format-options label {
     font-size: 0.85rem;
   }
-  #applyButton,
+  .applyButton,
   #state-no-results button,
   #state-done button {
     font-size: 0.85rem;
