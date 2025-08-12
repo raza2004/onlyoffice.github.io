@@ -84,6 +84,12 @@
           "light": "#107cbc",
           "dark":  "#5f55af"
         },
+        "screenshots" : [
+					"resources/store/screenshots/screen_1.png",
+					"resources/store/screenshots/screen_2.png",
+					"resources/store/screenshots/screen_3.png",
+					"resources/store/screenshots/screen_4.png"
+				],
         "categories": ["work","specAbilities"],
         "icons": {
           "light": "resources/store/icons",
