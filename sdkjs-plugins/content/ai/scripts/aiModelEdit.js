@@ -1,3 +1,35 @@
+/*
+ * (c) Copyright Ascensio System SIA 2010-2025
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation. In accordance with
+ * Section 7(a) of the GNU AGPL its Section 15 shall be amended to the effect
+ * that Ascensio System SIA expressly excludes the warranty of non-infringement
+ * of any third-party rights.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For
+ * details, see the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA at 20A-6 Ernesta Birznieka-Upish
+ * street, Riga, Latvia, EU, LV-1050.
+ *
+ * The  interactive user interfaces in modified source and object code versions
+ * of the Program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * Pursuant to Section 7(b) of the License you must retain the original Product
+ * logo when distributing the program. Pursuant to Section 7(e) we decline to
+ * grant you any rights under trademark law for use of our trademarks.
+ *
+ * All the Product's GUI elements, including illustrations and icon sets, as
+ * well as technical writing content are licensed under the terms of the
+ * Creative Commons Attribution-ShareAlike 4.0 International. See the License
+ * terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ */
+
 var type = 'add';
 var aiModel = null;
 var isModelCmbInit = true;
@@ -70,100 +102,111 @@ var updateModelsErrorTip = new Tooltip(updateModelsErrorEl, {
 	width: 233,
 });
 
+const providerKeyTip = new Tooltip(providerKeyInputEl, {
+	align: 'center',
+	width: 250,
+	text: "You can obtain information about the key on the provider's website. This field is not mandatory.",
+});
+
+const useAllBtn = new ToggleButton({
+	id: 'use-all',
+	label: 'All',
+	onToggle: function(value) {
+		for (const capability in capabilitiesElements) {
+			var item = capabilitiesElements[capability];
+			item.btn.setValue(value);
+		}
+	}
+});
+
 var capabilitiesElements = {
 	text: {
 		btn: new ToggleButton({
 			id: 'use-for-text',
-			icon: 'resources/icons/light/ai-texts' + getZoomSuffixForImage() + '.png'
-		}),
-		tip: new Tooltip(document.getElementById('use-for-text'), {
-			text: 'Text',
-			yAnchor: 'top',
-			xAnchor: 'left',
-			align: 'left'
+			label: 'Text',
+			onToggle: onToggleCapability
 		}),
 		capabilities: AI.CapabilitiesUI.Chat
 	},
 	image: {
 		btn: new ToggleButton({
 			id: 'use-for-image',
-			icon: 'resources/icons/light/ai-images' + getZoomSuffixForImage() + '.png'
-		}),
-		tip: new Tooltip(document.getElementById('use-for-image'), {
-			text: 'Images',
-			yAnchor: 'top'
+			label: 'Images',
+			onToggle: onToggleCapability
 		}),
 		capabilities: AI.CapabilitiesUI.Image
 	},
 	embeddings: {
 		btn: new ToggleButton({
 			id: 'use-for-embeddings',
-			icon: 'resources/icons/light/ai-embeddings' + getZoomSuffixForImage() + '.png'
-		}),
-		tip: new Tooltip(document.getElementById('use-for-embeddings'), {
-			text: 'Embeddings',
-			yAnchor: 'top'
+			label: 'Embeddings',
+			onToggle: onToggleCapability
 		}),
 		capabilities: AI.CapabilitiesUI.Embeddings
 	},
 	audio: {
 		btn: new ToggleButton({
 			id: 'use-for-audio',
-			icon: 'resources/icons/light/ai-audio' + getZoomSuffixForImage() + '.png'
-		}),
-		tip: new Tooltip(document.getElementById('use-for-audio'), {
-			text: 'Audio Processing',
-			yAnchor: 'top'
+			label: 'Audio Processing',
+			onToggle: onToggleCapability
 		}),
 		capabilities: AI.CapabilitiesUI.Audio
 	},
 	moderations: {
 		btn: new ToggleButton({
 			id: 'use-for-moderations',
-			icon: 'resources/icons/light/ai-moderations' + getZoomSuffixForImage() + '.png'
-		}),
-		tip: new Tooltip(document.getElementById('use-for-moderations'), {
-			text: 'Content Moderation',
-			yAnchor: 'top'
+			label: 'Content Moderation',
+			onToggle: onToggleCapability
 		}),
 		capabilities: AI.CapabilitiesUI.Moderations
 	},
 	realtime: {
 		btn: new ToggleButton({
 			id: 'use-for-realtime',
-			icon: 'resources/icons/light/ai-realtime' + getZoomSuffixForImage() + '.png'
-		}),
-		tip: new Tooltip(document.getElementById('use-for-realtime'), {
-			text: 'Realtime Tasks',
-			yAnchor: 'top',
+			label: 'Realtime Tasks',
+			onToggle: onToggleCapability
 		}),
 		capabilities: AI.CapabilitiesUI.Realtime
 	},
 	code: {
 		btn: new ToggleButton({
 			id: 'use-for-code',
-			icon: 'resources/icons/light/ai-code' + getZoomSuffixForImage() + '.png'
-		}),
-		tip: new Tooltip(document.getElementById('use-for-code'), {
-			text: 'Coding Help',
-			yAnchor: 'top',
-			xAnchor: 'right',
-			align: 'right'
+			label: 'Coding Help',
+			onToggle: onToggleCapability
 		}),
 		capabilities: AI.CapabilitiesUI.Code
 	},
 	vision: {
 		btn: new ToggleButton({
 			id: 'use-for-vision',
-			icon: 'resources/icons/light/ai-visual-analysis' + getZoomSuffixForImage() + '.png'
-		}),
-		tip: new Tooltip(document.getElementById('use-for-vision'), {
-			text: 'Visual Analysis',
-			yAnchor: 'top',
-			xAnchor: 'right',
-			align: 'right'
+			label: 'Visual Analysis',
+			onToggle: onToggleCapability
 		}),
 		capabilities: AI.CapabilitiesUI.Vision
+	}
+};
+
+var heightUpdateConditions = {
+	_init: false,
+	_translate: false,
+	_markReady: function(key) {
+		heightUpdateConditions[key] = true;
+		heightUpdateConditions._checkAllReady();
+	},
+	_checkAllReady: function() {
+		if (
+			heightUpdateConditions._init &&
+			heightUpdateConditions._translate
+		) {
+			updateWindowHeight();
+		}
+	},
+
+	initReady: function() {
+		heightUpdateConditions._markReady('_init');
+	},
+	translateReady: function() {
+		heightUpdateConditions._markReady('_translate');
 	}
 };
 
@@ -190,6 +233,8 @@ window.Asc.plugin.init = function() {
 			resolveModels && resolveModels(res);
 		}
 	});
+
+	heightUpdateConditions.initReady();
 }
 window.Asc.plugin.onThemeChanged = onThemeChanged;
 
@@ -201,8 +246,10 @@ window.Asc.plugin.onTranslate = function () {
 
 	for (const capability in capabilitiesElements) {
 		var item = capabilitiesElements[capability];
-		item.tip.setText(window.Asc.plugin.tr(item.tip.getText()));
+		item.btn.setLabel(window.Asc.plugin.tr(item.btn.getLabel()));
 	}
+
+	heightUpdateConditions.translateReady();
 };
 
 window.addEventListener("resize", onResize);
@@ -210,16 +257,11 @@ onResize();
 
 function onThemeChanged(theme) {
 	window.Asc.plugin.onThemeChangedBase(theme);
-	themeType = theme.type || 'light';
 	
-	var classes = document.body.className.split(' ');
-	classes.forEach(function(className) {
-		if (className.indexOf('theme-') != -1) {
-			document.body.classList.remove(className);
-		}
-	});
-	document.body.classList.add(theme.name);
-	document.body.classList.add('theme-type-' + themeType);
+	var themeType = theme.type || 'light';
+	updateBodyThemeClasses(theme.type, theme.name);
+	updateThemeVariables(theme);
+	
 	$('img.icon').each(function() {
 		var src = $(this).attr('src');
 		var newSrc = src.replace(/(icons\/)([^\/]+)(\/)/, '$1' + themeType + '$3');
@@ -234,6 +276,15 @@ function getZoomSuffixForImage() {
 	if(ratio == 1) return ''
 	else {
 		return '@' + ratio + 'x';
+	}
+}
+
+function updateWindowHeight() {
+	const contentHeight = $('body').prop('scrollHeight');
+	const visibleHeight = $('body').innerHeight();
+
+	if(contentHeight > visibleHeight) {
+		window.Asc.plugin.sendToPlugin("onUpdateHeight", contentHeight + 5);
 	}
 }
 
@@ -400,6 +451,18 @@ function onChangeModelComboBox() {
 		else
 			nameInputEl.value = modelObj.name;
 	}
+}
+
+function onToggleCapability() {
+	let isActiveAll = true;
+	for (const capability in capabilitiesElements) {
+		const isActive = capabilitiesElements[capability].btn.getValue();
+		if(!isActive) {
+			isActiveAll = false;
+			break;
+		} 
+	}
+	useAllBtn.setValue(isActiveAll);
 }
 
 function getCapabilities() {
@@ -637,7 +700,7 @@ function ToggleButton(options) {
 		// Default parameters
 		var defaults = {
 			id: '',
-			icon: '',
+			label: '',
 			value: false,
 			disabled: false,
 			onToggle: function (state) {}
@@ -650,29 +713,22 @@ function ToggleButton(options) {
 		this.value = false;
 		this.disabled = false;
 
-		this.buttonEl = document.createElement("button");
-		this.buttonEl.className = "toggle-button";
-
-		this.iconEl = document.createElement("img");
-		this.iconEl.className = "icon";
-		this.iconEl.src = this.options.icon;
-
-		this.buttonEl.appendChild(this.iconEl);
+		this.$button = $('<button class="toggle-button">' + this.options.label + '</button>');
 
 		this.setValue(this.options.value);
 		this.setDisabled(this.options.disabled);
 
 		// Add click event listener
 		var self = this; // To preserve context
-		this.buttonEl.addEventListener("click", function () {
+		this.$button.on('click', function () {
 			self.setValue(!self.value);
 			self.options.onToggle && self.options.onToggle(self.value); // Call the callback
 		});
 
 		// Add button to the container
-		var container = document.getElementById(this.options.id);
-		if (container) {
-			container.appendChild(this.buttonEl);
+		var $container = $('#' + this.options.id);
+		if ($container) {
+			$container.append(this.$button);
 		} else {
 			console.error("Container with ID '" + this.options.id + "' not found.");
 		}
@@ -680,22 +736,26 @@ function ToggleButton(options) {
 
 	this.setValue = function(value) {
 		this.value = value;
-		if(value) {
-			this.buttonEl.classList.add('active');
-		} else {
-			this.buttonEl.classList.remove('active');
-		}
+		this.$button.toggleClass('active', value);
 	};
 	this.getValue = function() {
 		return this.value;
 	};
 
+	this.setLabel = function(label) {
+		this.options.label = label;
+		this.$button.text(label);
+	};
+	this.getLabel = function() {
+		return this.options.label;
+	};
+
 	this.setDisabled = function(value) {
 		this.disabled = value;
 		if(value) {
-			this.buttonEl.setAttribute('disabled', true);
+			this.$button.attr('disabled', true);
 		} else {
-			this.buttonEl.removeAttribute('disabled');
+			this.$button.removeAttr('disabled');
 		}
 	};
 	this.getDisabled = function() {
