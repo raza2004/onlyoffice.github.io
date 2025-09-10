@@ -160,6 +160,88 @@ var WORD_FUNCTIONS = {};
 
 		return func;
 	}
+	//
+WORD_FUNCTIONS.generateHashtags = function()
+{
+    let func = new RegisteredFunction();
+    func.name = "generateHashtags";
+    func.description = "Use this function if you need to generate hashtags for selected text. The AI will analyze the content and return a set of relevant hashtags that can be inserted directly after the selected text or at the end of the document.";
+    func.params = [
+        "count (number): how many hashtags to generate (default is 5)"
+    ];
+
+    func.examples = [
+        "If you need to generate hashtags for selected text, respond with:\n" +
+        "[functionCalling (generateHashtags)]: {\"prompt\" : \"Generate hashtags for this text\"}",
+
+        "If you need to generate 10 hashtags for a paragraph, respond with:\n" +
+        "[functionCalling (generateHashtags)]: {\"prompt\" : \"Generate 10 hashtags for this paragraph\", \"count\": 10}",
+
+        "If you need to create social media hashtags, respond with:\n" +
+        "[functionCalling (generateHashtags)]: {\"prompt\" : \"Generate social media hashtags\"}"
+    ];
+    
+    func.call = async function(params) {
+        let count = params.count || 5;
+
+        let text = await Asc.Editor.callCommand(function(){
+            let doc = Api.GetDocument();
+            let range = doc.GetRangeBySelect();
+            let text = range ? range.GetText() : "";
+            if (!text)
+            {
+                text = doc.GetCurrentWord();
+                doc.SelectCurrentWord();
+            }
+            return text;
+        });
+
+        let argPromt = params.prompt + 
+            ":\nText: " + text + 
+            "\nGenerate " + count + " short and relevant hashtags. Output hashtags only, separated by spaces.";
+
+        let requestEngine = AI.Request.create(AI.ActionType.Chat);
+        if (!requestEngine)
+            return;
+
+        let isSendedEndLongAction = false;
+        async function checkEndAction() {
+            if (!isSendedEndLongAction) {
+                await Asc.Editor.callMethod("EndAction", ["Block", "AI (" + requestEngine.modelUI.name + ")"]);
+                isSendedEndLongAction = true
+            }
+        }
+
+        await Asc.Editor.callMethod("StartAction", ["Block", "AI (" + requestEngine.modelUI.name + ")"]);
+        await Asc.Editor.callMethod("StartAction", ["GroupActions"]);
+
+        let result = await requestEngine.chatRequest(argPromt, false, async function(data) {
+            if (!data)
+                return;
+
+            await checkEndAction();
+            Asc.scope.data = data;
+            Asc.scope.model = requestEngine.modelUI.name;
+
+            await Asc.Editor.callCommand(function(){
+                // Insert hashtags after the selected text
+                let doc = Api.GetDocument();
+                let range = doc.GetRangeBySelect();
+                if (range) {
+                    range.Collapse(false); // move cursor after selection
+                }
+                Api.GetDocument().InsertText(" " + Asc.scope.data);
+            });
+        });
+
+        await checkEndAction();
+        await Asc.Editor.callMethod("EndAction", ["GroupActions"]);
+    };
+
+    return func;
+}
+
+	//
 	WORD_FUNCTIONS.rewriteText = function() 
 	{
 		let func = new RegisteredFunction();
@@ -524,6 +606,7 @@ function getWordFunctions() {
 
 	funcs.push(WORD_FUNCTIONS.changeTextStyle());
 	funcs.push(WORD_FUNCTIONS.commentText());
+	funcs.push(WORD_FUNCTIONS.generateHashtags());
 	funcs.push(WORD_FUNCTIONS.rewriteText());
 	funcs.push(WORD_FUNCTIONS.insertPage());
 	funcs.push(WORD_FUNCTIONS.checkSpelling());
