@@ -242,122 +242,112 @@ WORD_FUNCTIONS.generateHashtags = function()
 }
 
 	//
-	WORD_FUNCTIONS.rewriteText = function() 
-	{
-		let func = new RegisteredFunction();
-		func.name = "rewriteText";
-		func.params = [
-			"parNumber (number): the paragraph number to change",
-			"prompt (string): instructions on how to change the text",
-			"showDifference (boolean): whether to show the difference between the original and new text, or just replace it",
-			"type (string): which part of the text to be rewritten (e.g., 'sentence' or 'paragraph')"
-		];
-		func.description = "Use this function when you asked to rewrite or replace some text. If text or paragraph number is not specified assume that we are working with the current paragraph.";
+	WORD_FUNCTIONS.generateHashtags = function()
+{
+    let func = new RegisteredFunction();
+    func.name = "generateHashtags";
+    func.description = "Use this function if you need to generate hashtags for selected text. The AI will analyze the content and return a set of relevant hashtags that can be inserted directly after the selected text or at the end of the document.";
+    func.params = [
+        "count (number): how many hashtags to generate (default is 5)"
+    ];
 
-		func.examples = [
-			"if you need to rewrite, respond with:\n" +
-			"[functionCalling (rewriteText)]: {\"prompt\": \"Rewrite\", \"type\" : \"paragraph\"}",
+    func.examples = [
+        "If you need to generate hashtags for selected text, respond with:\n" +
+        "[functionCalling (generateHashtags)]: {\"prompt\" : \"Generate hashtags for this text\"}",
 
-			"If you need to rephrase current sentence, respond with:\n" +
-			"[functionCalling (rewriteText)]: {\"prompt\": \"rephrase sentence\", \"type\" : \"sentence\"}",
+        "If you need to generate 10 hashtags for a paragraph, respond with:\n" +
+        "[functionCalling (generateHashtags)]: {\"prompt\" : \"Generate 10 hashtags for this paragraph\", \"count\": 10}",
 
-			"If you need to rephrase current sentence and show difference, respond with:\n" +
-			"[functionCalling (rewriteText)]: {\"prompt\": \"rephrase sentence\", \"type\" : \"sentence\", \"showDifference\" : true}",
+        "If you need to create social media hashtags, respond with:\n" +
+        "[functionCalling (generateHashtags)]: {\"prompt\" : \"Generate social media hashtags\"}"
+    ];
+    
+    func.call = async function(params) {
+        console.log("[generateHashtags] Called with params:", params);
 
-			"if you need to change paragraph 2 to be more emotional, respond with:\n" +
-			"[functionCalling (rewriteText)]: {\"parNumber\": 2, \"prompt\": \"make the text more emotional\", \"type\" : \"paragraph\"}",
+        let count = params.count || 5;
+        console.log("[generateHashtags] Hashtag count set to:", count);
 
-			"if you need to rewrite the first paragraph, respond with:\n" +
-			"[functionCalling (rewriteText)]: {\"parNumber\": 1, \"prompt\": \"Rephrase \", \"type\" : \"paragraph\"}",
+        let text = await Asc.Editor.callCommand(function(){
+            let doc = Api.GetDocument();
+            let range = doc.GetRangeBySelect();
+            let text = range ? range.GetText() : "";
+            if (!text)
+            {
+                text = doc.GetCurrentWord();
+                doc.SelectCurrentWord();
+            }
+            return text;
+        });
 
-			"if you need to rewrite the current paragraph to be more official, respond with:\n" +
-			"[functionCalling (rewriteText)]: {\"prompt\": \"Rewrite in official style\", \"type\" : \"paragraph\"}"
-		];
-		
-		func.call = async function(params) {
+        console.log("[generateHashtags] Selected text:", text);
 
-			let text = "";
-			if ("paragraph" === params.type)
-			{
-				Asc.scope.parNumber = params.parNumber;
-				text = await Asc.Editor.callCommand(function(){
-					let doc = Api.GetDocument();
-					let par = undefined === Asc.scope.parNumber ? doc.GetCurrentParagraph() : doc.GetElement(Asc.scope.parNumber - 1);
-					if (!par)
-						return "";
-					par.Select();
-					return par.GetText();
-				});
-			}
-			else // if ("sentence" === params.type)
-			{
-				text = await Asc.Editor.callCommand(function(){
-					return Api.GetDocument().GetCurrentSentence();
-				});
-			}
+        if (!text || text.trim().length === 0) {
+            console.warn("[generateHashtags] No text selected or found. Aborting.");
+            return;
+        }
 
-			let argPromt = params.prompt + ":\n" + text + "\n Answer with only the new one sentence, no need of any explanations";
+        let argPromt = params.prompt + 
+            ":\nText: " + text + 
+            "\nGenerate " + count + " short and relevant hashtags. Output hashtags only, separated by spaces.";
 
-			let requestEngine = AI.Request.create(AI.ActionType.Chat);
-			if (!requestEngine)
-				return;
+        console.log("[generateHashtags] Final prompt being sent to AI:", argPromt);
 
-			await Asc.Editor.callMethod("StartAction", ["GroupActions"]);
+        let requestEngine = AI.Request.create(AI.ActionType.Chat);
+        if (!requestEngine) {
+            console.error("[generateHashtags] AI request engine not created. Aborting.");
+            return;
+        }
+        console.log("[generateHashtags] AI Request Engine created with model:", requestEngine.modelUI.name);
 
-			let turnOffTrackChanges = false;
-			if (params.showDifference)
-			{
-				let isTrackChanges = await Asc.Editor.callCommand(function(){
-					return Api.GetDocument().IsTrackRevisions();
-				});
+        let isSendedEndLongAction = false;
+        async function checkEndAction() {
+            if (!isSendedEndLongAction) {
+                await Asc.Editor.callMethod("EndAction", ["Block", "AI (" + requestEngine.modelUI.name + ")"]);
+                console.log("[generateHashtags] EndAction called.");
+                isSendedEndLongAction = true;
+            }
+        }
 
-				if (!isTrackChanges)
-				{
-					await Asc.Editor.callCommand(function(){
-						Api.GetDocument().SetTrackRevisions(true);
-					});
-					turnOffTrackChanges = true;
-				}
-			}
+        await Asc.Editor.callMethod("StartAction", ["Block", "AI (" + requestEngine.modelUI.name + ")"]);
+        console.log("[generateHashtags] StartAction Block started.");
+        await Asc.Editor.callMethod("StartAction", ["GroupActions"]);
+        console.log("[generateHashtags] GroupActions started.");
 
-			await Asc.Editor.callMethod("StartAction", ["Block", "AI (" + requestEngine.modelUI.name + ")"]);
+        let result = await requestEngine.chatRequest(argPromt, false, async function(data) {
+            console.log("[generateHashtags] Received AI data:", data);
 
-			let isSendedEndLongAction = false;
-			async function checkEndAction() {
-				if (!isSendedEndLongAction) {
-					await Asc.Editor.callMethod("EndAction", ["Block", "AI (" + requestEngine.modelUI.name + ")"]);
-					isSendedEndLongAction = true
-				}
-			}
+            if (!data) {
+                console.warn("[generateHashtags] No data returned from AI.");
+                return;
+            }
 
-			let result = await requestEngine.chatRequest(argPromt, false, async function(data) {
-				if (!data)
-					return;
-				await checkEndAction();
+            await checkEndAction();
+            Asc.scope.data = data;
+            Asc.scope.model = requestEngine.modelUI.name;
 
-				if (text && "sentence" === params.type)
-				{
-					Asc.scope.data = data;
-					await Asc.Editor.callCommand(function(){
-						let doc = Api.GetDocument();
-						doc.ReplaceCurrentSentence("");
-					});
-					text = null;
-				}
+            await Asc.Editor.callCommand(function(){
+                let doc = Api.GetDocument();
+                let range = doc.GetRangeBySelect();
+                if (range) {
+                    range.Collapse(false); // move cursor after selection
+                }
+                console.log("[generateHashtags] Inserting hashtags into document:", Asc.scope.data);
+                Api.GetDocument().InsertText(" " + Asc.scope.data);
+            });
+        });
 
-				await Asc.Library.PasteText(data);
-			});
+        console.log("[generateHashtags] AI Request finished:", result);
 
-			await checkEndAction();
+        await checkEndAction();
+        await Asc.Editor.callMethod("EndAction", ["GroupActions"]);
+        console.log("[generateHashtags] GroupActions ended.");
+    };
 
-			if (turnOffTrackChanges)
-				await Asc.Editor.callCommand(function(){return Api.GetDocument().SetTrackRevisions(false);});
+    return func;
+}
 
-			await Asc.Editor.callMethod("EndAction", ["GroupActions"]);
-		};
-
-		return func;
-	}
+	//
 	WORD_FUNCTIONS.changeTextStyle = function()
 	{
 		let func = new RegisteredFunction();
@@ -427,6 +417,7 @@ WORD_FUNCTIONS.generateHashtags = function()
 
 		return func;
 	}
+	//
 	WORD_FUNCTIONS.insertPage = function()
 	{
 		let func = new RegisteredFunction();
