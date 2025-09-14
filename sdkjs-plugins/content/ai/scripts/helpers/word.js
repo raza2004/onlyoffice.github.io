@@ -598,7 +598,7 @@ function getWordFunctions() {
 	funcs.push(WORD_FUNCTIONS.changeTextStyle());
 	funcs.push(WORD_FUNCTIONS.commentText());
 	funcs.push(WORD_FUNCTIONS.generateHashtags());
-	funcs.push(WORD_FUNCTIONS.rewriteText());
+	// funcs.push(WORD_FUNCTIONS.rewriteText());
 	funcs.push(WORD_FUNCTIONS.insertPage());
 	funcs.push(WORD_FUNCTIONS.checkSpelling());
 
