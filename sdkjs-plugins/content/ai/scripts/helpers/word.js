@@ -227,7 +227,7 @@ let argPromt = userPrompt +
                 // Insert hashtags after the selected text
                 let doc = Api.GetDocument();
 
-                doc.InsertText(" " + Asc.scope.data);
+                doc.InsertContent(" " + Asc.scope.data);
             });
         });
 
@@ -327,7 +327,7 @@ let argPromt = userPrompt +
                 let doc = Api.GetDocument();
                 
                 console.log("[generateHashtags] Inserting hashtags into document:", Asc.scope.data);
-                doc.InsertText(" " + Asc.scope.data);
+                doc.InsertContent(" " + Asc.scope.data);
             });
         });
 
