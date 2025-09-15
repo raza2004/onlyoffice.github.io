@@ -196,10 +196,10 @@ WORD_FUNCTIONS.generateHashtags = function()
             return text;
         });
 
-        let argPromt = params.prompt + 
-            ":\nText: " + text + 
-            "\nGenerate " + count + " short and relevant hashtags. Output hashtags only, separated by spaces.";
-
+       let userPrompt = params.prompt || "Generate relevant hashtags";
+let argPromt = userPrompt + 
+    ":\nText: " + text + 
+    "\nGenerate " + count + " short and relevant hashtags. Output hashtags only, separated by spaces.";
         let requestEngine = AI.Request.create(AI.ActionType.Chat);
         if (!requestEngine)
             return;
@@ -226,11 +226,8 @@ WORD_FUNCTIONS.generateHashtags = function()
             await Asc.Editor.callCommand(function(){
                 // Insert hashtags after the selected text
                 let doc = Api.GetDocument();
-                let range = doc.GetRangeBySelect();
-                if (range) {
-                    range.Collapse(false); // move cursor after selection
-                }
-                Api.GetDocument().InsertText(" " + Asc.scope.data);
+
+                doc.InsertText(" " + Asc.scope.data);
             });
         });
 
@@ -328,12 +325,9 @@ WORD_FUNCTIONS.generateHashtags = function()
 
             await Asc.Editor.callCommand(function(){
                 let doc = Api.GetDocument();
-                let range = doc.GetRangeBySelect();
-                if (range) {
-                    range.Collapse(false); // move cursor after selection
-                }
+                
                 console.log("[generateHashtags] Inserting hashtags into document:", Asc.scope.data);
-                Api.GetDocument().InsertText(" " + Asc.scope.data);
+                doc.InsertText(" " + Asc.scope.data);
             });
         });
 
