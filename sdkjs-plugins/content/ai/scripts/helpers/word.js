@@ -32,9 +32,8 @@
 
 var WORD_FUNCTIONS = {};
 
-(function(){
-	WORD_FUNCTIONS.commentText = function()
-	{
+(function () {
+	WORD_FUNCTIONS.commentText = function () {
 		let func = new RegisteredFunction();
 		func.name = "commentText";
 		func.description = "Use this function if you asked to comment or explain anything. If text or paragraph number is not specified assume that we are working with the current paragraph. Specify whether the explanation should be added as a comment or as a footnote. The AI will generate the content based on your prompt and insert it in the chosen format.";
@@ -59,17 +58,16 @@ var WORD_FUNCTIONS = {};
 			"If you need to explain selected text as a footnote, respond with:\n" +
 			"[functionCalling (commentText)]: {\"prompt\" : \"Explain this text\", \"type\": \"footnote\"}"
 		];
-		
-		func.call = async function(params) {
+
+		func.call = async function (params) {
 			let type = params.type;
 			let isFootnote = "footnote" === type;
 
-			let text = await Asc.Editor.callCommand(function(){
+			let text = await Asc.Editor.callCommand(function () {
 				let doc = Api.GetDocument();
 				let range = doc.GetRangeBySelect();
 				let text = range ? range.GetText() : "";
-				if (!text)
-				{
+				if (!text) {
 					text = doc.GetCurrentWord();
 					doc.SelectCurrentWord();
 				}
@@ -94,10 +92,9 @@ var WORD_FUNCTIONS = {};
 			await Asc.Editor.callMethod("StartAction", ["Block", "AI (" + requestEngine.modelUI.name + ")"]);
 			await Asc.Editor.callMethod("StartAction", ["GroupActions"]);
 
-			if (isFootnote)
-			{
+			if (isFootnote) {
 				let addFootnote = true;
-				let result = await requestEngine.chatRequest(argPromt, false, async function(data) {
+				let result = await requestEngine.chatRequest(argPromt, false, async function (data) {
 					if (!data)
 						return;
 
@@ -105,9 +102,8 @@ var WORD_FUNCTIONS = {};
 					Asc.scope.data = data;
 					Asc.scope.model = requestEngine.modelUI.name;
 
-					if (addFootnote)
-					{
-						await Asc.Editor.callCommand(function(){
+					if (addFootnote) {
+						await Asc.Editor.callCommand(function () {
 							Api.GetDocument().AddFootnote();
 						});
 						addFootnote = false;
@@ -115,10 +111,9 @@ var WORD_FUNCTIONS = {};
 					await Asc.Library.PasteText(data);
 				});
 			}
-			else 
-			{
+			else {
 				let commentId = null;
-				let result = await requestEngine.chatRequest(argPromt, false, async function(data) {
+				let result = await requestEngine.chatRequest(argPromt, false, async function (data) {
 					if (!data)
 						return;
 
@@ -127,12 +122,11 @@ var WORD_FUNCTIONS = {};
 					Asc.scope.model = requestEngine.modelUI.name;
 					Asc.scope.commentId = commentId;
 
-					commentId = await Asc.Editor.callCommand(function(){
+					commentId = await Asc.Editor.callCommand(function () {
 						let doc = Api.GetDocument();
 
 						let commentId = Asc.scope.commentId;
-						if (!commentId)
-						{
+						if (!commentId) {
 							let range = doc.GetRangeBySelect();
 							if (!range)
 								return null;
@@ -162,118 +156,119 @@ var WORD_FUNCTIONS = {};
 	}
 
 	//
-WORD_FUNCTIONS.generateHashtags = function() {
-    let func = new RegisteredFunction();
-    func.name = "generateHashtags";
-    func.description = "Use this function if you need to generate hashtags for selected text. The AI will analyze the content and return a set of relevant hashtags that can be inserted directly after the selected text or at the end of the document.";
-    func.params = [
-        "count (number): how many hashtags to generate (default is 5)"
-    ];
+	WORD_FUNCTIONS.generateHashtags = function () {
+		let func = new RegisteredFunction();
+		func.name = "generateHashtags";
+		func.description = "Use this function if you need to generate hashtags for selected text. The AI will analyze the content and return a set of relevant hashtags that can be inserted directly after the selected text or at the end of the document.";
+		func.params = [
+			"count (number): how many hashtags to generate (default is 5)"
+		];
 
-    func.examples = [
-        "If you need to generate hashtags for selected text, respond with:\n" +
-        "[functionCalling (generateHashtags)]: {\"prompt\" : \"Generate hashtags for this text\"}",
+		func.examples = [
+			"If you need to generate hashtags for selected text, respond with:\n" +
+			"[functionCalling (generateHashtags)]: {\"prompt\" : \"Generate hashtags for this text\"}",
 
-        "If you need to generate 10 hashtags for a paragraph, respond with:\n" +
-        "[functionCalling (generateHashtags)]: {\"prompt\" : \"Generate 10 hashtags for this paragraph\", \"count\": 10}",
+			"If you need to generate 10 hashtags for a paragraph, respond with:\n" +
+			"[functionCalling (generateHashtags)]: {\"prompt\" : \"Generate 10 hashtags for this paragraph\", \"count\": 10}",
 
-        "If you need to create social media hashtags, respond with:\n" +
-        "[functionCalling (generateHashtags)]: {\"prompt\" : \"Generate social media hashtags\"}"
-    ];
+			"If you need to create social media hashtags, respond with:\n" +
+			"[functionCalling (generateHashtags)]: {\"prompt\" : \"Generate social media hashtags\"}"
+		];
 
-    func.call = async function(params) {
-        console.log("[generateHashtags] Called with params:", params);
+		func.call = async function (params) {
+			console.log("[generateHashtags] Called with params:", params);
 
-        let count = params.count || 5;
-        console.log("[generateHashtags] Hashtag count set to:", count);
+			let count = params.count || 5;
+			console.log("[generateHashtags] Hashtag count set to:", count);
 
-        let text = await Asc.Editor.callCommand(function() {
-            let doc = Api.GetDocument();
-            let range = doc.GetRangeBySelect();
-            let text = range ? range.GetText() : "";
-            if (!text) {
-                text = doc.GetCurrentWord();
-                doc.SelectCurrentWord();
-            }
-            return text;
-        });
+			let text = await Asc.Editor.callCommand(function () {
+				let doc = Api.GetDocument();
+				let range = doc.GetRangeBySelect();
+				let text = range ? range.GetText() : "";
+				if (!text) {
+					text = doc.GetCurrentWord();
+					doc.SelectCurrentWord();
+				}
+				return text;
+			});
 
-        console.log("[generateHashtags] Selected text:", text);
+			console.log("[generateHashtags] Selected text:", text);
 
-        if (!text || text.trim().length === 0) {
-            console.warn("[generateHashtags] No text selected or found. Aborting.");
-            return;
-        }
+			if (!text || text.trim().length === 0) {
+				console.warn("[generateHashtags] No text selected or found. Aborting.");
+				return;
+			}
 
-        // ✅ Fix undefined prompt issue
-        let userPrompt = params.prompt || "Generate hashtags";
-        let argPrompt = `${userPrompt}:\nText: ${text}\nGenerate ${count} short and relevant hashtags. Output hashtags only, separated by spaces.`;
+			// ✅ Fix undefined prompt issue
+			let userPrompt = params.prompt || "Generate hashtags";
+			let argPrompt = `${userPrompt}:\nText: ${text}\nGenerate ${count} short and relevant hashtags. Output hashtags only, separated by spaces.`;
 
-        console.log("[generateHashtags] Final prompt being sent to AI:", argPrompt);
+			console.log("[generateHashtags] Final prompt being sent to AI:", argPrompt);
 
-        let requestEngine = AI.Request.create(AI.ActionType.Chat);
-        if (!requestEngine) {
-            console.error("[generateHashtags] AI request engine not created. Aborting.");
-            return;
-        }
-        console.log("[generateHashtags] AI Request Engine created with model:", requestEngine.modelUI.name);
+			let requestEngine = AI.Request.create(AI.ActionType.Chat);
+			if (!requestEngine) {
+				console.error("[generateHashtags] AI request engine not created. Aborting.");
+				return;
+			}
+			console.log("[generateHashtags] AI Request Engine created with model:", requestEngine.modelUI.name);
 
-        let isSendedEndLongAction = false;
-        async function checkEndAction() {
-            if (!isSendedEndLongAction) {
-                await Asc.Editor.callMethod("EndAction", ["Block", "AI (" + requestEngine.modelUI.name + ")"]);
-                console.log("[generateHashtags] EndAction called.");
-                isSendedEndLongAction = true;
-            }
-        }
+			let isSendedEndLongAction = false;
+			async function checkEndAction() {
+				if (!isSendedEndLongAction) {
+					await Asc.Editor.callMethod("EndAction", ["Block", "AI (" + requestEngine.modelUI.name + ")"]);
+					console.log("[generateHashtags] EndAction called.");
+					isSendedEndLongAction = true;
+				}
+			}
 
-        await Asc.Editor.callMethod("StartAction", ["Block", "AI (" + requestEngine.modelUI.name + ")"]);
-        console.log("[generateHashtags] StartAction Block started.");
-        await Asc.Editor.callMethod("StartAction", ["GroupActions"]);
-        console.log("[generateHashtags] GroupActions started.");
+			await Asc.Editor.callMethod("StartAction", ["Block", "AI (" + requestEngine.modelUI.name + ")"]);
+			console.log("[generateHashtags] StartAction Block started.");
+			await Asc.Editor.callMethod("StartAction", ["GroupActions"]);
+			console.log("[generateHashtags] GroupActions started.");
 
-        let finalOutput = ""; // ✅ collect all chunks before inserting
+			let finalOutput = ""; // ✅ collect all chunks before inserting
 
-        let result = await requestEngine.chatRequest(argPrompt, false, async function(data) {
-            console.log("[generateHashtags] Received AI data chunk:", data);
-            if (data) {
-                finalOutput += data.trim() + " ";
-            }
-        });
+			let result = await requestEngine.chatRequest(argPrompt, false, async function (data) {
+				console.log("[generateHashtags] Received AI data chunk:", data);
+				if (data) {
+					finalOutput += data.trim() + " ";
+				}
+			});
 
-        finalOutput = finalOutput.trim();
-        console.log("[generateHashtags] AI Request finished. Final hashtags:", finalOutput);
+			finalOutput = finalOutput.trim();
+			console.log("[generateHashtags] AI Request finished. Final hashtags:", finalOutput);
 
-        if (finalOutput) {
-            await checkEndAction();
-            Asc.scope.data = finalOutput;
-            Asc.scope.model = requestEngine.modelUI.name;
+			if (finalOutput) {
+				await checkEndAction();
+				Asc.scope.data = finalOutput;
+				Asc.scope.model = requestEngine.modelUI.name;
 
-            // ✅ Insert hashtags after selection (not replacing it)
-            await Asc.Editor.callCommand(function() {
-                let doc = Api.GetDocument();
-                doc.MoveCursorToEnd(); // ✅ keep selected text, move after it
-                console.log("[generateHashtags] Inserting hashtags into document:", Asc.scope.data);
-				let run = Api.CreateRun();
+				// ✅ Insert hashtags after selection (not replacing it)
+				await Asc.Editor.callCommand(function () {
+					let doc = Api.GetDocument();
+					doc.MoveCursorToEnd(); // ✅ keep selected text, move after it
+					console.log("[generateHashtags] Inserting hashtags into document:", Asc.scope.data);
+					let paragraph = Api.CreateParagraph();
+					paragraph.AddText(" " + Asc.scope.data);
+					doc.Push(paragraph);
 
-                run.AddText(" " + Asc.scope.data);
-            });
-        } else {
-            console.warn("[generateHashtags] No hashtags generated by AI.");
-        }
 
-        await checkEndAction();
-        await Asc.Editor.callMethod("EndAction", ["GroupActions"]);
-        console.log("[generateHashtags] GroupActions ended.");
-    };
+				});
+			} else {
+				console.warn("[generateHashtags] No hashtags generated by AI.");
+			}
 
-    return func;
-}
+			await checkEndAction();
+			await Asc.Editor.callMethod("EndAction", ["GroupActions"]);
+			console.log("[generateHashtags] GroupActions ended.");
+		};
+
+		return func;
+	}
 
 
 	//
-	WORD_FUNCTIONS.changeTextStyle = function()
-	{
+	WORD_FUNCTIONS.changeTextStyle = function () {
 		let func = new RegisteredFunction();
 		func.name = "changeTextStyle";
 		func.params = [
@@ -283,38 +278,37 @@ WORD_FUNCTIONS.generateHashtags = function() {
 			"strikeout (boolean): whether to strike out the text",
 			"fontSize (number): font size to apply to the selected text"
 		];
-		
+
 		func.examples = [
 			"If you need to make selected text bold and italic, respond with:" +
 			"[functionCalling (changeTextStyle)]: {\"bold\": true, \"italic\": true }",
-		
+
 			"If you need to underline the selected text, respond with:" +
 			"[functionCalling (changeTextStyle)]: {\"underline\": true }",
-		
+
 			"If you need to strike out the selected text, respond with:" +
 			"[functionCalling (changeTextStyle)]: {\"strikeout\": true }",
-		
+
 			"If you need to set the font size of selected text to 18, respond with:" +
 			"[functionCalling (changeTextStyle)]: {\"fontSize\": 18 }",
-		
+
 			"If you need to make selected text bold, respond with:" +
 			"[functionCalling (changeTextStyle)]: {\"bold\": true }",
-		
+
 			"If you need to make selected text non-italic, respond with:" +
 			"[functionCalling (changeTextStyle)]: {\"italic\": false }"
 		];
-		
-		func.call = async function(params) {
+
+		func.call = async function (params) {
 			Asc.scope.bold = params.bold;
 			Asc.scope.italic = params.italic;
 			Asc.scope.underline = params.underline;
 			Asc.scope.strikeout = params.strikeout;
 			Asc.scope.fontSize = params.fontSize;
-			await Asc.Editor.callCommand(function(){
+			await Asc.Editor.callCommand(function () {
 				let doc = Api.GetDocument();
 				let range = doc.GetRangeBySelect();
-				if (!range || "" === range.GetText())
-				{
+				if (!range || "" === range.GetText()) {
 					doc.SelectCurrentWord();
 					range = doc.GetRangeBySelect();
 				}
@@ -342,8 +336,7 @@ WORD_FUNCTIONS.generateHashtags = function() {
 		return func;
 	}
 	//
-	WORD_FUNCTIONS.insertPage = function()
-	{
+	WORD_FUNCTIONS.insertPage = function () {
 		let func = new RegisteredFunction();
 		func.name = "insertPage";
 		func.params = [
@@ -360,11 +353,11 @@ WORD_FUNCTIONS.generateHashtags = function() {
 			"If you need to add page to the start of the document, respond with:" +
 			"[functionCalling (insertPage)]: {\"location\": \"start\"}"
 		];
-		
-		func.call = async function(params) {
+
+		func.call = async function (params) {
 			Asc.scope.location = params.location;
 
-			await Asc.Editor.callCommand(function(){
+			await Asc.Editor.callCommand(function () {
 				let doc = Api.GetDocument();
 				if ("start" === Asc.scope.location)
 					doc.MoveCursorToStart();
@@ -377,8 +370,7 @@ WORD_FUNCTIONS.generateHashtags = function() {
 
 		return func;
 	}
-	WORD_FUNCTIONS.checkSpelling = function() 
-	{
+	WORD_FUNCTIONS.checkSpelling = function () {
 		let func = new RegisteredFunction();
 		func.name = "checkSpelling";
 		func.params = [
@@ -390,10 +382,10 @@ WORD_FUNCTIONS.generateHashtags = function() {
 			"if you need to check spelling for the current paragraph, respond with:\n" +
 			"[functionCalling (checkSpelling)]: {}"
 		];
-		
-		func.call = async function(params) {
 
-			let text = await Asc.Editor.callCommand(function(){
+		func.call = async function (params) {
+
+			let text = await Asc.Editor.callCommand(function () {
 				let par = Api.GetDocument().GetCurrentParagraph();
 				if (!par)
 					return "";
@@ -403,7 +395,7 @@ WORD_FUNCTIONS.generateHashtags = function() {
 
 			let argPromt = "Check spelling and grammar for text:" + ":\n" + text + "\n Answer with only the new corrected text, no need of any explanations.";
 
-			let isTrackChanges = await Asc.Editor.callCommand(function(){
+			let isTrackChanges = await Asc.Editor.callCommand(function () {
 				let isOn = Api.GetDocument().IsTrackRevisions();
 				if (isOn)
 					Api.GetDocument().SetTrackRevisions(false);
@@ -428,7 +420,7 @@ WORD_FUNCTIONS.generateHashtags = function() {
 
 			let resultText = "";
 
-			let result = await requestEngine.chatRequest(argPromt, false, async function(data) {
+			let result = await requestEngine.chatRequest(argPromt, false, async function (data) {
 				if (!data)
 					return;
 				await checkEndAction();
@@ -439,11 +431,11 @@ WORD_FUNCTIONS.generateHashtags = function() {
 				await Asc.Editor.callMethod("StartAction", ["GroupActions"]);
 
 				Asc.scope.text = resultText;
-				await Asc.Editor.callCommand(function(){
+				await Asc.Editor.callCommand(function () {
 					let par = Api.GetDocument().GetCurrentParagraph();
 					if (!par)
 						return "";
-					par.Select();					
+					par.Select();
 					Api.ReplaceTextSmart([Asc.scope.text]);
 				});
 			});
@@ -454,12 +446,12 @@ WORD_FUNCTIONS.generateHashtags = function() {
 			await Asc.Editor.callMethod("StartAction", ["GroupActions"]);
 
 			Asc.scope.modelName = requestEngine.modelUI.name;
-			await Asc.Editor.callCommand(function(){
+			await Asc.Editor.callCommand(function () {
 				return Api.GetDocument().SetAssistantTrackRevisions(true, Asc.scope.modelName);
 			});
 
 			Asc.scope.text = resultText;
-			await Asc.Editor.callCommand(function(){
+			await Asc.Editor.callCommand(function () {
 				let par = Api.GetDocument().GetCurrentParagraph();
 				if (!par)
 					return "";
@@ -467,13 +459,12 @@ WORD_FUNCTIONS.generateHashtags = function() {
 				Api.ReplaceTextSmart([Asc.scope.text]);
 			});
 
-			await Asc.Editor.callCommand(function(){
+			await Asc.Editor.callCommand(function () {
 				return Api.GetDocument().SetAssistantTrackRevisions(false);
 			});
 
-			if (isTrackChanges)
-			{
-				await Asc.Editor.callCommand(function(){
+			if (isTrackChanges) {
+				await Asc.Editor.callCommand(function () {
 					Api.GetDocument().SetTrackRevisions(true);
 				});
 			}
@@ -488,8 +479,7 @@ WORD_FUNCTIONS.generateHashtags = function() {
 function getWordFunctions() {
 
 	let funcs = [];
-	if (true) 
-	{
+	if (true) {
 		let func = new RegisteredFunction();
 		func.name = "changeParagraphStyle";
 		func.params = [
@@ -501,11 +491,11 @@ function getWordFunctions() {
 			"If you need to change the style of paragraph 3 to Heading 1, respond with:" +
 			"[functionCalling (changeParagraphStyle)]: {\"parNumber\": 3, \"style\": \"Heading 1\"}"
 		];
-		
-		func.call = async function(params) {
+
+		func.call = async function (params) {
 			Asc.scope.parNumber = params.parNumber;
 			Asc.scope.styleName = params.style;
-			await Asc.Editor.callCommand(function(){
+			await Asc.Editor.callCommand(function () {
 				let doc = Api.GetDocument();
 				let par = doc.GetElement(Asc.scope.parNumber - 1);
 				if (!par)
@@ -513,7 +503,7 @@ function getWordFunctions() {
 
 				let style = doc.GetStyle(Asc.scope.styleName);
 				par.SetStyle(style);
-			});			
+			});
 		};
 
 		funcs.push(func);
