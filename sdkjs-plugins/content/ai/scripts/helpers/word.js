@@ -249,7 +249,7 @@ var WORD_FUNCTIONS = {};
 					doc.MoveCursorToEnd(); // ✅ keep selected text, move after it
 					console.log("[generateHashtags] Inserting hashtags into document:", Asc.scope.data);
 					let paragraph = Api.CreateParagraph();
-					paragraph.AddText(" " + Asc.scope.data);
+					paragraph.AddText(Asc.scope.data);
 					doc.Push(paragraph);
 
 
