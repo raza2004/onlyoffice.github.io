@@ -176,10 +176,8 @@ var WORD_FUNCTIONS = {};
     ];
 
     func.call = async function (params) {
-        console.log("[generateHashtags] Called with params:", params);
 
         let count = params.count || 5;
-        console.log("[generateHashtags] Hashtag count set to:", count);
 
         let text = await Asc.Editor.callCommand(function () {
             let doc = Api.GetDocument();
@@ -192,7 +190,6 @@ var WORD_FUNCTIONS = {};
             return text;
         });
 
-        console.log("[generateHashtags] Selected text:", text);
 
         if (!text || text.trim().length === 0) {
             console.warn("[generateHashtags] No text selected or found. Aborting.");
@@ -203,14 +200,12 @@ var WORD_FUNCTIONS = {};
         let userPrompt = params.prompt || "Generate hashtags";
         let argPrompt = `${userPrompt}:\nText: ${text}\nGenerate ${count} short and relevant hashtags. Output hashtags only, separated by spaces.`;
 
-        console.log("[generateHashtags] Final prompt being sent to AI:", argPrompt);
 
         let requestEngine = AI.Request.create(AI.ActionType.Chat);
         if (!requestEngine) {
             console.error("[generateHashtags] AI request engine not created. Aborting.");
             return;
         }
-        console.log("[generateHashtags] AI Request Engine created with model:", requestEngine.modelUI.name);
 
         let isSendedEndLongAction = false;
         async function checkEndAction() {
@@ -222,18 +217,18 @@ var WORD_FUNCTIONS = {};
         }
 
         await Asc.Editor.callMethod("StartAction", ["Block", "AI (" + requestEngine.modelUI.name + ")"]);
-        console.log("[generateHashtags] StartAction Block started.");
+        
         await Asc.Editor.callMethod("StartAction", ["GroupActions"]);
-        console.log("[generateHashtags] GroupActions started.");
 
-        let chunks = []; // ✅ Collect raw chunks
 
-        let result = await requestEngine.chatRequest(argPrompt, false, async function (data) {
-            console.log("[generateHashtags] Received AI data chunk:", data);
-            if (data) {
-                chunks.push(data); // store as-is, do not trim, do not add spaces
-            }
-        });
+        let chunks = [];
+
+        // let result = await requestEngine.chatRequest(argPrompt, false, async function (data) {
+        //     console.log("[generateHashtags] Received AI data chunk:", data);
+        //     if (data) {
+        //         chunks.push(data); // store as-is, do not trim, do not add spaces
+        //     }
+        // });
 
         let finalOutput = chunks.join(""); // join without spaces
         finalOutput = finalOutput.replace(/\s+/g, " ").trim(); // normalize spacing once
@@ -248,7 +243,7 @@ var WORD_FUNCTIONS = {};
             // ✅ Insert hashtags after selection
             await Asc.Editor.callCommand(function () {
                 let doc = Api.GetDocument();
-                doc.MoveCursorToEndOfSelection();
+                // doc.MoveCursorToEndOfSelection();
                 console.log("Inserting hashtags into document:", Asc.scope.data);
                 let paragraph = Api.CreateParagraph();
                 paragraph.AddText(Asc.scope.data);
