@@ -188,6 +188,7 @@ WORD_FUNCTIONS.generateHashtags = function () {
             if (!text || text.trim().length === 0) {
                 text = doc.GetText();
             }
+            console.log("text", text);
             return text;
         });
 
