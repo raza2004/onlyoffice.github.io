@@ -186,7 +186,9 @@ WORD_FUNCTIONS.generateHashtags = function () {
 
             // ✅ If no selection, use the entire document
             if (!text || text.trim().length === 0) {
+				doc.MoveCursorToStart();
                 text = doc.GetText();
+                
             }
             console.log("text", text);
             return text;
