@@ -155,8 +155,10 @@ var WORD_FUNCTIONS = {};
 		return func;
 	}
 
-	//
 	WORD_FUNCTIONS.generateHashtags = function () {
+
+		// Create a new registered function
+
 		let func = new RegisteredFunction();
 		func.name = "generateHashtags";
 		func.description = "Use this function if you need to generate hashtags for selected text. If no text is selected, the whole document will be used. The AI will analyze the content and return a set of relevant hashtags that can be inserted at the end of the document.";
@@ -174,9 +176,10 @@ var WORD_FUNCTIONS = {};
 			"If you need to create social media hashtags, respond with:\n" +
 			"[functionCalling (generateHashtags)]: {\"prompt\" : \"Generate social media hashtags\"}"
 		];
-
+		
 		func.call = async function (params) {
 
+			// Default to 5 hashtags if count is not specified
 			let count = params.count || 5;
 
 			let text = await Asc.Editor.callCommand(function () {
@@ -184,7 +187,7 @@ var WORD_FUNCTIONS = {};
 				let range = doc.GetRangeBySelect();
 				let text = range ? range.GetText() : "";
 
-				// ✅ If no selection, use the entire document
+				// If no selection, use the entire document
 				if (!text || text.trim().length === 0) {
 					doc.MoveCursorToStart();
 					text = doc.GetText();
@@ -198,7 +201,6 @@ var WORD_FUNCTIONS = {};
 				return;
 			}
 
-			// ✅ Fix undefined prompt issue
 			let userPrompt = params.prompt || "Generate hashtags";
 			let argPrompt = `${userPrompt}:\nText: ${text}\nGenerate ${count} short and relevant hashtags. Output hashtags only, separated by spaces.`;
 
@@ -232,14 +234,14 @@ var WORD_FUNCTIONS = {};
 			let finalOutput = chunks.join("");
 			finalOutput = finalOutput.replace(/\s+/g, " ").trim();
 
-			console.log("[generateHashtags] AI Request finished. Final hashtags:", finalOutput);
+			// console.log("[generateHashtags] AI Request finished. Final hashtags:", finalOutput);
 
 			if (finalOutput) {
 				await checkEndAction();
 				Asc.scope.data = finalOutput;
 				Asc.scope.model = requestEngine.modelUI.name;
 
-				// ✅ Always insert hashtags at end of doc
+				// Always insert hashtags at end of doc
 				await Asc.Editor.callCommand(function () {
 					let doc = Api.GetDocument();
 					doc.MoveCursorToEnd();
@@ -260,7 +262,6 @@ var WORD_FUNCTIONS = {};
 	};
 
 
-	//
 	WORD_FUNCTIONS.changeTextStyle = function () {
 		let func = new RegisteredFunction();
 		func.name = "changeTextStyle";
@@ -328,7 +329,7 @@ var WORD_FUNCTIONS = {};
 
 		return func;
 	}
-	//
+	
 	WORD_FUNCTIONS.insertPage = function () {
 		let func = new RegisteredFunction();
 		func.name = "insertPage";
