@@ -22,7 +22,7 @@ The plugin supports:
 ### Activate the Text Highlighter Plugin
 
 * Go to the **Plugin** tab.
-* Enable the **Text Highlighter** plugin in the "Background Plugins" section.
+* Click the **Text Highlighter** plugin in the "Plugins" section.
 
 ### Highlight Text
 
