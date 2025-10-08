@@ -1,7 +1,7 @@
 (function (window) {
   "use strict";
 
-  // === 1) Dropdown toggle bindings (run once on DOM load) ===
+  // === 1) Dropdown toggle bindings (run once on DOM load)
   document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".dropdown-header").forEach(header => {
       header.addEventListener("click", () => {
@@ -15,16 +15,11 @@
     // Let OnlyOffice apply its base styling
     window.Asc.plugin.onThemeChangedBase(theme);
 
-    // Log to console
-    console.log("Detected theme:", theme.type);
-
     // Toggle our dark-mode class
     document.body.classList.toggle("dark-mode", theme.type === "dark");
   }
   window.Asc.plugin.attachEvent?.("onThemeChanged", onThemeChanged);
   window.Asc.plugin.onThemeChanged = onThemeChanged;
-
-  // === 2) ONLYOFFICE plugin code ===
 
   // UI elements (filled in init)
   let searchInput, ignoreCaseBox, applyBtn;
@@ -46,7 +41,7 @@
     highlightMore2 = document.getElementById("HighlightMore2");
     revertBtn = document.getElementById("RevertToOriginal");
 
-    Asc.scope.textColor = '#000000'; // match the pickr default
+    Asc.scope.textColor = '#000000';
     const pickrEl = document.getElementById('textColorPicker');
     if (pickrEl) {
       const pickr = Pickr.create({
@@ -89,7 +84,7 @@
     applyBtn.disabled = true;
     searchInput.addEventListener("input", () => {
       applyBtn.disabled = !searchInput.value.trim();
-      Asc.scope.appliedToSelection = false; // <-- add this
+      Asc.scope.appliedToSelection = false;
     });
 
     applyBtn.addEventListener("click", onApply);
@@ -121,7 +116,7 @@
     showInput();
   };
 
-  // 3) Apply highlights - FIXED VERSION
+  // 3) Apply highlights
   function onApply() {
     const caseSens = !ignoreCaseBox.checked;
     const hlColor = document.getElementById("highlightColor").value;
@@ -150,12 +145,10 @@
     window.Asc.plugin.callCommand(function () {
       const doc = Api.GetDocument();
       const core = doc.GetCore();
-core.SetLanguage("fr-FR");
+      core.SetLanguage("fr-FR");
 
-const language = core.GetLanguage();
+      const language = core.GetLanguage();
 
-  console.log("Document language:", language);
- 
 
       const range = doc.GetRangeBySelect();
       const textPr = Api.CreateTextPr();
@@ -240,7 +233,7 @@ const language = core.GetLanguage();
   }
 
 
-  // 5) After each callCommand - Updated version
+  // 5) After each callCommand 
   window.Asc.plugin.onCommandCallback = function (count) {
     const n = Number(count) || 0;
     loader.style.display = "none";
@@ -264,44 +257,43 @@ const language = core.GetLanguage();
   };
 
   // 6) Translation hookup
-window.Asc.plugin.onTranslate = () => {
-//  const doc = Api.GetDocument();
+  window.Asc.plugin.onTranslate = () => {
 
-  const map = {
-    PluginInstructions: "PluginInstructions",
-    TextToSearch: "TextToSearch",
-    IgnoreCase: "IgnoreCase",
-    HighlightColor: "HighlightColor",
-    HighlightYellow: "HighlightYellow",
-    HighlightGreen: "HighlightGreen",
-    HighlightBlue: "HighlightBlue",
-    HighlightRed: "HighlightRed",
-    HighlightNone: "HighlightNone",
-    TextColorHeader: "TextColorHeader",
-    ArrowDropdown: "ArrowDropdown",
-    TextFormattingHeader: "TextFormattingHeader",
-    FormatBold: "FormatBold",
-    FormatItalic: "FormatItalic",
-    FormatUnderline: "FormatUnderline",
-    FormatStrike: "FormatStrike",
-    ApplyButton: "ApplyButton",
-    RevertToOriginal: "RevertToOriginal",
-    SearchNoResults: "SearchNoResults",
-    HighlightMore1: "HighlightMore",
-    HighlightMore2: "HighlightMore",
-    SearchDone: "SearchDone",
-    MatchesFound: "MatchesFound",
-    LoadingMessage: "LoadingMessage"
+    const map = {
+      PluginInstructions: "PluginInstructions",
+      TextToSearch: "TextToSearch",
+      IgnoreCase: "IgnoreCase",
+      HighlightColor: "HighlightColor",
+      HighlightYellow: "HighlightYellow",
+      HighlightGreen: "HighlightGreen",
+      HighlightBlue: "HighlightBlue",
+      HighlightRed: "HighlightRed",
+      HighlightNone: "HighlightNone",
+      TextColorHeader: "TextColorHeader",
+      ArrowDropdown: "ArrowDropdown",
+      TextFormattingHeader: "TextFormattingHeader",
+      FormatBold: "FormatBold",
+      FormatItalic: "FormatItalic",
+      FormatUnderline: "FormatUnderline",
+      FormatStrike: "FormatStrike",
+      ApplyButton: "ApplyButton",
+      RevertToOriginal: "RevertToOriginal",
+      SearchNoResults: "SearchNoResults",
+      HighlightMore1: "HighlightMore",
+      HighlightMore2: "HighlightMore",
+      SearchDone: "SearchDone",
+      MatchesFound: "MatchesFound",
+      LoadingMessage: "LoadingMessage"
+    };
+
+    for (const id in map) {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = window.Asc.plugin.tr(map[id]);
+    }
+
+    const searchInput = document.getElementById("searchText");
+    if (searchInput) searchInput.placeholder = window.Asc.plugin.tr("SearchPlaceholder");
   };
-
-  for (const id in map) {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = window.Asc.plugin.tr(map[id]);
-  }
-
-  const searchInput = document.getElementById("searchText");
-  if (searchInput) searchInput.placeholder = window.Asc.plugin.tr("SearchPlaceholder");
-};
 
 
 })(window);
