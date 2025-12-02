@@ -257,7 +257,7 @@
   };
 
   // 6) Translation hookup
-  // 6) Translation hookup with fallback to existing English HTML text
+  
 window.Asc.plugin.onTranslate = function () {
   const ids = [
     "PluginInstructions",
