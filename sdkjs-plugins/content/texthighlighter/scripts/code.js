@@ -257,53 +257,59 @@
   };
 
   // 6) Translation hookup
-  
 window.Asc.plugin.onTranslate = function () {
-  const ids = [
-    "PluginInstructions",
-    "TextToSearch",
-    "IgnoreCase",
-    "HighlightColor",
-    "HighlightYellow",
-    "HighlightGreen",
-    "HighlightBlue",
-    "HighlightRed",
-    "HighlightNone",
-    "TextColorHeader",
-    "TextFormattingHeader",
-    "FormatBold",
-    "FormatItalic",
-    "FormatUnderline",
-    "FormatStrike",
-    "ApplyButton",
-    "SearchNoResults",
-    "SearchDone",
-    "MatchesFound",
-    "HighlightMore1",
-    "HighlightMore2",
-    "RevertToOriginal",
-    "LoadingMessage"
-  ];
 
-  ids.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      const translated = window.Asc.plugin.tr(id);
-      // If translation exists and is different from key itself → apply, else keep default English text
-      if (translated && translated !== id) {
-        el.innerHTML = translated;
-      }
-    }
-  });
+    const $ = id => document.getElementById(id);
+    const trSafe = key => {
+        const t = window.Asc.plugin.tr(key);
+        return (t && t !== key) ? t : null; // null → fallback to English text from HTML
+    };
 
-  const input = document.getElementById("searchText");
-  if (input) {
-    const ph = window.Asc.plugin.tr("SearchPlaceholder");
-    if (ph && ph !== "SearchPlaceholder") {
-      input.placeholder = ph;
+    // Simple text replacements (like setTr in TextCleaner)
+    const applyTr = (id) => {
+        const el = $(id);
+        if (!el) return;
+        const translated = trSafe(id);
+        if (translated) el.innerHTML = translated;   // fallback happens automatically
+    };
+
+    // IDs to translate (same style as TextCleaner)
+    const idsToTranslate = [
+        "PluginInstructions",
+        "TextToSearch",
+        "IgnoreCase",
+        "HighlightColor",
+        "HighlightYellow",
+        "HighlightGreen",
+        "HighlightBlue",
+        "HighlightRed",
+        "HighlightNone",
+        "TextColorHeader",
+        "TextFormattingHeader",
+        "FormatBold",
+        "FormatItalic",
+        "FormatUnderline",
+        "FormatStrike",
+        "ApplyButton",
+        "SearchNoResults",
+        "SearchDone",
+        "MatchesFound",
+        "HighlightMore1",
+        "HighlightMore2",
+        "RevertToOriginal",
+        "LoadingMessage"
+    ];
+
+    idsToTranslate.forEach(applyTr);
+
+    // Placeholder translation (TextCleaner also does this)
+    const input = $("searchText");
+    if (input) {
+        const placeholder = trSafe("SearchPlaceholder");
+        if (placeholder) input.placeholder = placeholder;
     }
-  }
 };
+
 
 
 
