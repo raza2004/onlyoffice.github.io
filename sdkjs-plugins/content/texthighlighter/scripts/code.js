@@ -122,6 +122,9 @@
 
   // 3) Apply highlights
   function onApply() {
+    // Reset undo count for each new apply action
+    Asc.scope.undoCount = 1;
+    
     const caseSens = !ignoreCaseBox.checked;
     const hlColor = document.getElementById("highlightColor").value;
     const txtColor = Asc.scope.textColor || "#000000";
