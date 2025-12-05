@@ -3,7 +3,7 @@
 
   // === 1) Dropdown toggle bindings (run once on DOM load)
   document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll(".dropdown-header").forEach(header => {
+    document.querySelectorAll(".dropdown-header").forEach((header) => {
       header.addEventListener("click", () => {
         header.parentElement.classList.toggle("open");
       });
@@ -41,28 +41,34 @@
     highlightMore2 = document.getElementById("HighlightMore2");
     revertBtn = document.getElementById("RevertToOriginal");
 
-    Asc.scope.textColor = '#000000';
-    const pickrEl = document.getElementById('textColorPicker');
+    Asc.scope.textColor = "#000000";
+    const pickrEl = document.getElementById("textColorPicker");
     if (pickrEl) {
       const pickr = Pickr.create({
         el: pickrEl,
-        theme: 'classic',
-        default: '#000000',
+        theme: "classic",
+        default: "#000000",
         components: {
           preview: true,
           opacity: true,
           hue: true,
-          interaction: { hex: true, rgba: false, input: true, clear: false, save: true }
-        }
+          interaction: {
+            hex: true,
+            rgba: false,
+            input: true,
+            clear: false,
+            save: true,
+          },
+        },
       });
 
-      pickr.on('init', (instance) => {
+      pickr.on("init", (instance) => {
         const hex = instance.getColor().toHEXA().toString();
         Asc.scope.textColor = hex;
         Asc.scope.lastTxtColor = hex;
       });
 
-      pickr.on('save', (color) => {
+      pickr.on("save", (color) => {
         const hex = color.toHEXA().toString();
         Asc.scope.textColor = hex;
         Asc.scope.lastTxtColor = hex;
@@ -70,14 +76,12 @@
       });
     }
 
-
     // Simple state-switchers
     function showInput() {
       stateInput.style.display = "";
       stateNo.style.display = "none";
       stateDone.style.display = "none";
       loader.style.display = "none";
-
     }
 
     // Wire up UI
@@ -100,7 +104,7 @@
 
     // React when user changes selection in the document
     if (window.Asc.plugin.attachEvent) {
-      window.Asc.plugin.attachEvent("onSelectionChanged", sel => {
+      window.Asc.plugin.attachEvent("onSelectionChanged", (sel) => {
         if (sel && sel.text) {
           searchInput.value = sel.text;
           applyBtn.disabled = false;
@@ -149,7 +153,6 @@
 
       const language = core.GetLanguage();
 
-
       const range = doc.GetRangeBySelect();
       const textPr = Api.CreateTextPr();
 
@@ -161,7 +164,10 @@
       if (Asc.scope.doStrike) textPr.SetStrikeout(true);
 
       if (Asc.scope.txtColor !== "#000000") {
-        const rgb = Asc.scope.txtColor.slice(1).match(/.{2}/g).map(h => parseInt(h, 16));
+        const rgb = Asc.scope.txtColor
+          .slice(1)
+          .match(/.{2}/g)
+          .map((h) => parseInt(h, 16));
         textPr.SetColor(rgb[0], rgb[1], rgb[2], false);
       }
 
@@ -173,7 +179,7 @@
       } else if (Asc.scope.lastTerm) {
         // Search mode if no selection
         const results = doc.Search(Asc.scope.lastTerm, Asc.scope.caseSens);
-        results.forEach(result => {
+        results.forEach((result) => {
           result.SetTextPr(textPr);
         });
         Asc.scope.appliedViaSelection = false;
@@ -181,7 +187,7 @@
       } else {
         // Apply to entire document
         const paragraphs = doc.GetAllParagraphs();
-        paragraphs.forEach(para => {
+        paragraphs.forEach((para) => {
           para.SetTextPr(textPr);
         });
         Asc.scope.appliedViaSelection = true;
@@ -235,46 +241,43 @@
   function onRevert() {
     // If nothing was applied, exit safely
     if (!Asc.scope.undoCount || Asc.scope.undoCount <= 0) {
-        resetToMainView();
-        return;
+      resetToMainView();
+      return;
     }
-
- 
-
 
     loader.style.display = "";
 
     const performUndo = (stepsRemaining) => {
-        if (stepsRemaining <= 0) {
-            // Done undoing → clean state
-            Asc.scope.undoCount = 0;
-            Asc.scope.lastTerm = "";
-            Asc.scope.appliedViaSelection = false;
+      if (stepsRemaining <= 0) {
+        // Done undoing → clean state
+        Asc.scope.undoCount = 0;
+        Asc.scope.lastTerm = "";
+        Asc.scope.appliedViaSelection = false;
 
-            loader.style.display = "none";
+        loader.style.display = "none";
 
-            // Show clean UI again
-            resetToMainView();
-            return;
-        }
+        // Show clean UI again
+        resetToMainView();
+        return;
+      }
 
-        // Perform 1 undo → then recursively undo the rest
-        window.Asc.plugin.executeMethod("Undo", null, () => {
-            setTimeout(() => performUndo(stepsRemaining - 1), 100);
-        });
+      // Perform 1 undo → then recursively undo the rest
+      window.Asc.plugin.executeMethod("Undo", null, () => {
+        setTimeout(() => performUndo(stepsRemaining - 1), 100);
+      });
     };
 
     // Start the undo chain
     performUndo(Asc.scope.undoCount);
-}
-   function resetToMainView() {
+  }
+  function resetToMainView() {
     stateInput.style.display = "";
     stateNo.style.display = "none";
     stateDone.style.display = "none";
     loader.style.display = "none";
-}
+  }
 
-  // 5) After each callCommand 
+  // 5) After each callCommand
   window.Asc.plugin.onCommandCallback = function (count) {
     const n = Number(count) || 0;
     loader.style.display = "none";
@@ -299,62 +302,56 @@
 
   Asc.scope.undoCount = 1; // one full operation to undo
 
-
   // 6) Translation hookup
-window.Asc.plugin.onTranslate = function () {
-
-    const $ = id => document.getElementById(id);
-    const trSafe = key => {
-        const t = window.Asc.plugin.tr(key);
-        return (t && t !== key) ? t : null; // null → fallback to English text from HTML
+  window.Asc.plugin.onTranslate = function () {
+    const $ = (id) => document.getElementById(id);
+    const trSafe = (key) => {
+      const t = window.Asc.plugin.tr(key);
+      return t && t !== key ? t : null; // null → fallback to English text from HTML
     };
 
     // Simple text replacements
     const applyTr = (id) => {
-        const el = $(id);
-        if (!el) return;
-        const translated = trSafe(id);
-        if (translated) el.innerHTML = translated;   // fallback happens automatically
+      const el = $(id);
+      if (!el) return;
+      const translated = trSafe(id);
+      if (translated) el.innerHTML = translated; // fallback happens automatically
     };
 
-    // IDs to translate 
+    // IDs to translate
     const idsToTranslate = [
-        "PluginInstructions",
-        "TextToSearch",
-        "IgnoreCase",
-        "HighlightColor",
-        "HighlightYellow",
-        "HighlightGreen",
-        "HighlightBlue",
-        "HighlightRed",
-        "HighlightNone",
-        "TextColorHeader",
-        "TextFormattingHeader",
-        "FormatBold",
-        "FormatItalic",
-        "FormatUnderline",
-        "FormatStrike",
-        "ApplyButton",
-        "SearchNoResults",
-        "SearchDone",
-        "MatchesFound",
-        "HighlightMore1",
-        "HighlightMore2",
-        "RevertToOriginal",
-        "LoadingMessage"
+      "PluginInstructions",
+      "TextToSearch",
+      "IgnoreCase",
+      "HighlightColor",
+      "HighlightYellow",
+      "HighlightGreen",
+      "HighlightBlue",
+      "HighlightRed",
+      "HighlightNone",
+      "TextColorHeader",
+      "TextFormattingHeader",
+      "FormatBold",
+      "FormatItalic",
+      "FormatUnderline",
+      "FormatStrike",
+      "ApplyButton",
+      "SearchNoResults",
+      "SearchDone",
+      "MatchesFound",
+      "HighlightMore1",
+      "HighlightMore2",
+      "RevertToOriginal",
+      "LoadingMessage",
     ];
 
     idsToTranslate.forEach(applyTr);
 
-    // Placeholder translation 
+    // Placeholder translation
     const input = $("searchText");
     if (input) {
-        const placeholder = trSafe("SearchPlaceholder");
-        if (placeholder) input.placeholder = placeholder;
+      const placeholder = trSafe("SearchPlaceholder");
+      if (placeholder) input.placeholder = placeholder;
     }
-};
-
-
-
-
+  };
 })(window);
