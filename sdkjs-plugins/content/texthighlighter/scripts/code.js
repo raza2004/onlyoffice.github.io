@@ -265,7 +265,7 @@ window.Asc.plugin.onTranslate = function () {
         return (t && t !== key) ? t : null; // null → fallback to English text from HTML
     };
 
-    // Simple text replacements (like setTr in TextCleaner)
+    // Simple text replacements
     const applyTr = (id) => {
         const el = $(id);
         if (!el) return;
@@ -273,7 +273,7 @@ window.Asc.plugin.onTranslate = function () {
         if (translated) el.innerHTML = translated;   // fallback happens automatically
     };
 
-    // IDs to translate (same style as TextCleaner)
+    // IDs to translate 
     const idsToTranslate = [
         "PluginInstructions",
         "TextToSearch",
@@ -302,7 +302,7 @@ window.Asc.plugin.onTranslate = function () {
 
     idsToTranslate.forEach(applyTr);
 
-    // Placeholder translation (TextCleaner also does this)
+    // Placeholder translation 
     const input = $("searchText");
     if (input) {
         const placeholder = trSafe("SearchPlaceholder");
