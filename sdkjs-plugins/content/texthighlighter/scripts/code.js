@@ -197,46 +197,6 @@
   }
 
   // 4) Revert highlights
-  // function onRevert() {
-  //   loader.style.display = "";
-
-  //   window.Asc.plugin.callCommand(function () {
-  //     const doc = Api.GetDocument();
-  //     const range = doc.GetRangeBySelect();
-
-  //     // Create a "revert" version of textPr
-  //     const textPr = Api.CreateTextPr();
-  //     textPr.SetHighlight("none");
-  //     textPr.SetBold(false);
-  //     textPr.SetItalic(false);
-  //     textPr.SetUnderline(false);
-  //     textPr.SetStrikeout(false);
-  //     textPr.SetColor(0, 0, 0, false);
-
-  //     if (range && range.GetText && range.GetText() !== "") {
-  //       // Revert selection only
-  //       range.SetTextPr(textPr);
-  //       Asc.scope.appliedViaSelection = true;
-  //       return 1;
-  //     } else if (Asc.scope.lastTerm) {
-  //       // Revert search results only
-  //       const results = doc.Search(Asc.scope.lastTerm, Asc.scope.caseSens);
-  //       results.forEach(result => {
-  //         result.SetTextPr(textPr);
-  //       });
-  //       Asc.scope.appliedViaSelection = false;
-  //       return results.length;
-  //     } else {
-  //       // Revert entire document
-  //       const paragraphs = doc.GetAllParagraphs();
-  //       paragraphs.forEach(para => {
-  //         para.SetTextPr(textPr);
-  //       });
-  //       Asc.scope.appliedViaSelection = true;
-  //       return paragraphs.length;
-  //     }
-  //   }, false);
-  // }
 
   function onRevert() {
     // If nothing was applied, exit safely
