@@ -191,47 +191,88 @@
   }
 
   // 4) Revert highlights
+  // function onRevert() {
+  //   loader.style.display = "";
+
+  //   window.Asc.plugin.callCommand(function () {
+  //     const doc = Api.GetDocument();
+  //     const range = doc.GetRangeBySelect();
+
+  //     // Create a "revert" version of textPr
+  //     const textPr = Api.CreateTextPr();
+  //     textPr.SetHighlight("none");
+  //     textPr.SetBold(false);
+  //     textPr.SetItalic(false);
+  //     textPr.SetUnderline(false);
+  //     textPr.SetStrikeout(false);
+  //     textPr.SetColor(0, 0, 0, false);
+
+  //     if (range && range.GetText && range.GetText() !== "") {
+  //       // Revert selection only
+  //       range.SetTextPr(textPr);
+  //       Asc.scope.appliedViaSelection = true;
+  //       return 1;
+  //     } else if (Asc.scope.lastTerm) {
+  //       // Revert search results only
+  //       const results = doc.Search(Asc.scope.lastTerm, Asc.scope.caseSens);
+  //       results.forEach(result => {
+  //         result.SetTextPr(textPr);
+  //       });
+  //       Asc.scope.appliedViaSelection = false;
+  //       return results.length;
+  //     } else {
+  //       // Revert entire document
+  //       const paragraphs = doc.GetAllParagraphs();
+  //       paragraphs.forEach(para => {
+  //         para.SetTextPr(textPr);
+  //       });
+  //       Asc.scope.appliedViaSelection = true;
+  //       return paragraphs.length;
+  //     }
+  //   }, false);
+  // }
+
   function onRevert() {
+    // If nothing was applied, exit safely
+    if (!Asc.scope.undoCount || Asc.scope.undoCount <= 0) {
+        resetToMainView();
+        return;
+    }
+
+ 
+
+
     loader.style.display = "";
 
-    window.Asc.plugin.callCommand(function () {
-      const doc = Api.GetDocument();
-      const range = doc.GetRangeBySelect();
+    const performUndo = (stepsRemaining) => {
+        if (stepsRemaining <= 0) {
+            // Done undoing → clean state
+            Asc.scope.undoCount = 0;
+            Asc.scope.lastTerm = "";
+            Asc.scope.appliedViaSelection = false;
 
-      // Create a "revert" version of textPr
-      const textPr = Api.CreateTextPr();
-      textPr.SetHighlight("none");
-      textPr.SetBold(false);
-      textPr.SetItalic(false);
-      textPr.SetUnderline(false);
-      textPr.SetStrikeout(false);
-      textPr.SetColor(0, 0, 0, false);
+            loader.style.display = "none";
 
-      if (range && range.GetText && range.GetText() !== "") {
-        // Revert selection only
-        range.SetTextPr(textPr);
-        Asc.scope.appliedViaSelection = true;
-        return 1;
-      } else if (Asc.scope.lastTerm) {
-        // Revert search results only
-        const results = doc.Search(Asc.scope.lastTerm, Asc.scope.caseSens);
-        results.forEach(result => {
-          result.SetTextPr(textPr);
+            // Show clean UI again
+            resetToMainView();
+            return;
+        }
+
+        // Perform 1 undo → then recursively undo the rest
+        window.Asc.plugin.executeMethod("Undo", null, () => {
+            setTimeout(() => performUndo(stepsRemaining - 1), 100);
         });
-        Asc.scope.appliedViaSelection = false;
-        return results.length;
-      } else {
-        // Revert entire document
-        const paragraphs = doc.GetAllParagraphs();
-        paragraphs.forEach(para => {
-          para.SetTextPr(textPr);
-        });
-        Asc.scope.appliedViaSelection = true;
-        return paragraphs.length;
-      }
-    }, false);
-  }
+    };
 
+    // Start the undo chain
+    performUndo(Asc.scope.undoCount);
+}
+   function resetToMainView() {
+    stateInput.style.display = "";
+    stateNo.style.display = "none";
+    stateDone.style.display = "none";
+    loader.style.display = "none";
+}
 
   // 5) After each callCommand 
   window.Asc.plugin.onCommandCallback = function (count) {
@@ -255,6 +296,9 @@
       stateNo.style.display = "none";
     }
   };
+
+  Asc.scope.undoCount = 1; // one full operation to undo
+
 
   // 6) Translation hookup
 window.Asc.plugin.onTranslate = function () {
