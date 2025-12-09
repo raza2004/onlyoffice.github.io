@@ -27,6 +27,7 @@
 
   "SearchNoResults": "検索完了。<strong>一致するものは見つかりませんでした。</strong>",
   "HighlightMore": "さらにハイライト",
+  "HighlightMore2": "さらにハイライト",
 
   "SearchDone": "完了！検索が完了し、スタイルが適用されました。",
   "MatchesFound": "一致件数：",

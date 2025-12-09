@@ -25,7 +25,7 @@
   let searchInput, ignoreCaseBox, applyBtn;
   let stateInput, stateNo, stateDone;
   let loader, foundCountSpan;
-  let highlightMore1, revertBtn;
+  let highlightMore1, highlightMore2, revertBtn;
 
   window.Asc.plugin.init = function (text) {
     // Cache DOM nodes
@@ -38,7 +38,7 @@
     loader = document.getElementById("loader");
     foundCountSpan = document.getElementById("foundCount");
     highlightMore1 = document.getElementById("HighlightMore1");
-    // highlightMore2 = document.getElementById("HighlightMore2");
+    highlightMore2 = document.getElementById("HighlightMore2");
     revertBtn = document.getElementById("RevertToOriginal");
 
     Asc.scope.textColor = "#000000";
@@ -93,7 +93,7 @@
 
     applyBtn.addEventListener("click", onApply);
     highlightMore1.addEventListener("click", showInput);
-    // highlightMore2.addEventListener("click", showInput);
+    highlightMore2.addEventListener("click", showInput);
     revertBtn.addEventListener("click", onRevert);
 
     // If the plugin was opened with a selection, use it
@@ -303,6 +303,7 @@
       "SearchDone",
       "MatchesFound",
       "HighlightMore1",
+      "HighlightMore2",
       "RevertToOriginal",
       "LoadingMessage",
     ];

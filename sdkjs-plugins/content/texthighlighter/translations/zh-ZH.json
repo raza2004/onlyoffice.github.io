@@ -26,7 +26,8 @@
 
   "SearchNoResults": "搜索完成。<strong>未找到匹配项。</strong>",
   "HighlightMore": "继续高亮",
-"ArrowDropdown": "▸",
+  "HighlightMore2": "继续高亮",
+  "ArrowDropdown": "▸",
   "SearchDone": "完成！搜索已完成并应用样式。",
   "MatchesFound": "找到匹配项：",
   "RevertToOriginal": "恢复",
