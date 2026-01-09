@@ -315,7 +315,6 @@ var WORD_FUNCTIONS = {};
             let range = doc.GetRangeBySelect();
             let selectedText = range ? range.GetText() : "";
 
-
             if (!selectedText || selectedText.trim().length === 0) {
                 doc.MoveCursorToStart();
                 selectedText = doc.GetText();
@@ -373,12 +372,16 @@ var WORD_FUNCTIONS = {};
             Asc.scope.data = finalOutput;
 
             await Asc.Editor.callCommand(function () {
-                let doc = Api.GetDocument();
-                doc.MoveCursorToEnd();
-                let paragraph = Api.CreateParagraph();
-                paragraph.AddText(Asc.scope.data);
-                doc.Push(paragraph);
-            });
+    let doc = Api.GetDocument();
+
+    doc.RemoveSelection();
+    doc.MoveCursorToEnd();
+
+    let paragraph = Api.CreateParagraph();
+    paragraph.AddText(Asc.scope.data);
+    doc.Push(paragraph);
+});
+
         } else {
             console.warn("[generateHashtags] No hashtags generated.");
         }
