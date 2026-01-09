@@ -185,6 +185,7 @@ var WORD_FUNCTIONS = {};
 			let text = await Asc.Editor.callCommand(function () {
 				let doc = Api.GetDocument();
 				let range = doc.GetRangeBySelect();
+				console.log("Range:", range);
 				let text = range ? range.GetText() : "";
 
 				// If no selection, use the entire document
@@ -245,6 +246,7 @@ var WORD_FUNCTIONS = {};
 				await Asc.Editor.callCommand(function () {
 					let doc = Api.GetDocument();
 					doc.MoveCursorToEnd();
+					console.log("[generateHashtags] Inserting hashtags at end of document:", Asc.scope.data);
 					let paragraph = Api.CreateParagraph();
 					paragraph.AddText(Asc.scope.data);
 					doc.Push(paragraph);
